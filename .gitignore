@@ -1,1 +1,6 @@
 /target
+.env
+.lock
+/.idea/
+/.vscode/
+/.sqlx/
