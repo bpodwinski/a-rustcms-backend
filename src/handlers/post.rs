@@ -81,16 +81,29 @@ pub async fn create_post(
 ) -> HttpResponse {
     let new_post = new_post.into_inner();
 
-    match sqlx::query!(
-        "INSERT INTO posts (title, content, author_id) VALUES ($1, $2, $3)",
+    let query_result = sqlx::query!(
+        "INSERT INTO posts (title, content, author_id) VALUES ($1, $2, $3) RETURNING id",
         new_post.title,
         new_post.content,
         new_post.author_id
     )
-    .execute(pool.get_ref())
-    .await
-    {
-        Ok(_) => HttpResponse::Created().finish(),
+        .fetch_one(pool.get_ref())
+        .await;
+
+    match query_result {
+        Ok(record) => {
+            let post_id: i32 = record.id;
+            match sqlx::query_as!(Post, "SELECT id, title, content, author_id FROM posts WHERE id = $1", post_id)
+                .fetch_one(pool.get_ref())
+                .await
+            {
+                Ok(post) => HttpResponse::Created().json(&post),
+                Err(e) => {
+                    eprintln!("Failed to fetch created post: {:?}", e);
+                    HttpResponse::InternalServerError().finish()
+                }
+            }
+        }
         Err(e) => {
             eprintln!("Failed to create post: {:?}", e);
             HttpResponse::InternalServerError().finish()
