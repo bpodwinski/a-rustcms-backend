@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 
@@ -18,6 +19,7 @@ pub struct PostStruct {
     pub content: String,
     pub author_id: i32,
     pub status: StatusEnum,
+    pub date_published: Option<NaiveDateTime>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -26,4 +28,5 @@ pub struct NewPostStruct {
     pub content: String,
     pub author_id: i32,
     pub status: StatusEnum,
+    pub date_published: Option<NaiveDateTime>,
 }

@@ -18,7 +18,7 @@ use sqlx::PgPool;
 pub async fn get_posts(pool: web::types::State<PgPool>) -> HttpResponse {
     let posts = match sqlx::query_as!(
         PostStruct,
-        "SELECT id, title, content, author_id, status as \"status: _\" FROM posts"
+        "SELECT id, title, content, author_id, status as \"status: _\", date_published FROM posts"
     )
     .fetch_all(pool.get_ref())
     .await
@@ -54,7 +54,7 @@ pub async fn get_post_by_id(
 
     match sqlx::query_as!(
         PostStruct,
-        "SELECT id, title, content, author_id, status as \"status: _\" FROM posts WHERE id = $1",
+        "SELECT id, title, content, author_id, status as \"status: _\", date_published FROM posts WHERE id = $1",
         post_id
     )
     .fetch_one(pool.get_ref())
@@ -88,11 +88,12 @@ pub async fn create_post(
     let new_post = new_post.into_inner();
 
     let query_result =
-    sqlx::query!("INSERT INTO posts (title, content, author_id, status) VALUES ($1, $2, $3, $4) RETURNING id",
+    sqlx::query!("INSERT INTO posts (title, content, author_id, status, date_published) VALUES ($1, $2, $3, $4, $5) RETURNING id",
         new_post.title,
         new_post.content,
         new_post.author_id,
-        new_post.status as StatusEnum
+        new_post.status as StatusEnum,
+        new_post.date_published
     )
     .fetch_one(pool.get_ref()).await;
 
@@ -101,7 +102,7 @@ pub async fn create_post(
             let post_id: i32 = record.id;
             match sqlx::query_as!(
                 PostStruct,
-                "SELECT id, title, content, author_id, status as \"status: _\" FROM posts WHERE id = $1",
+                "SELECT id, title, content, author_id, status as \"status: _\", date_published FROM posts WHERE id = $1",
                 post_id
             )
             .fetch_one(pool.get_ref())
@@ -143,11 +144,12 @@ pub async fn update_post_by_id(
     let post_id = post_id.into_inner();
     let updated_post = updated_post.into_inner();
 
-    match sqlx::query!("UPDATE posts SET title = $1, content = $2, author_id = $3, status = $4 WHERE id = $5",
+    match sqlx::query!("UPDATE posts SET title = $1, content = $2, author_id = $3, status = $4, date_published = $5 WHERE id = $6",
         updated_post.title,
         updated_post.content,
         updated_post.author_id,
         updated_post.status as StatusEnum,
+        updated_post.date_published,
         post_id
     )
     .execute(pool.get_ref()).await {
