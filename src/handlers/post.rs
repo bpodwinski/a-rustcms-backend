@@ -1,4 +1,4 @@
-use crate::models::post::{NewPost, Post};
+use crate::models::post::{NewPostStruct, PostStruct, StatusEnum};
 use ntex::web::types::Path;
 use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
@@ -16,9 +16,12 @@ use sqlx::PgPool;
 ///
 /// A `HttpResponse` containing a JSON array of all posts or an internal server error.
 pub async fn get_posts(pool: web::types::State<PgPool>) -> HttpResponse {
-    let posts = match sqlx::query_as!(Post, "SELECT id, title, content, author_id FROM posts")
-        .fetch_all(pool.get_ref())
-        .await
+    let posts = match sqlx::query_as!(
+        PostStruct,
+        "SELECT id, title, content, author_id, status as \"status: _\" FROM posts"
+    )
+    .fetch_all(pool.get_ref())
+    .await
     {
         Ok(posts) => posts,
         Err(e) => {
@@ -43,12 +46,15 @@ pub async fn get_posts(pool: web::types::State<PgPool>) -> HttpResponse {
 /// # Returns
 ///
 /// A `HttpResponse` containing the post as JSON or an internal server error if the post is not found.
-pub async fn get_post_by_id(pool: web::types::State<PgPool>, post_id: Path<i32>) -> HttpResponse {
+pub async fn get_post_by_id(
+    pool: web::types::State<PgPool>,
+    post_id: Path<i32>,
+) -> HttpResponse {
     let post_id = post_id.into_inner();
 
     match sqlx::query_as!(
-        Post,
-        "SELECT id, title, content, author_id FROM posts WHERE id = $1",
+        PostStruct,
+        "SELECT id, title, content, author_id, status as \"status: _\" FROM posts WHERE id = $1",
         post_id
     )
     .fetch_one(pool.get_ref())
@@ -77,25 +83,29 @@ pub async fn get_post_by_id(pool: web::types::State<PgPool>, post_id: Path<i32>)
 /// A `HttpResponse` indicating the result of the operation. If successful, it returns a `Created` status.
 pub async fn create_post(
     pool: web::types::State<PgPool>,
-    new_post: web::types::Json<NewPost>,
+    new_post: web::types::Json<NewPostStruct>,
 ) -> HttpResponse {
     let new_post = new_post.into_inner();
 
-    let query_result = sqlx::query!(
-        "INSERT INTO posts (title, content, author_id) VALUES ($1, $2, $3) RETURNING id",
+    let query_result =
+    sqlx::query!("INSERT INTO posts (title, content, author_id, status) VALUES ($1, $2, $3, $4) RETURNING id",
         new_post.title,
         new_post.content,
-        new_post.author_id
+        new_post.author_id,
+        new_post.status as StatusEnum
     )
-        .fetch_one(pool.get_ref())
-        .await;
+    .fetch_one(pool.get_ref()).await;
 
     match query_result {
         Ok(record) => {
             let post_id: i32 = record.id;
-            match sqlx::query_as!(Post, "SELECT id, title, content, author_id FROM posts WHERE id = $1", post_id)
-                .fetch_one(pool.get_ref())
-                .await
+            match sqlx::query_as!(
+                PostStruct,
+                "SELECT id, title, content, author_id, status as \"status: _\" FROM posts WHERE id = $1",
+                post_id
+            )
+            .fetch_one(pool.get_ref())
+            .await
             {
                 Ok(post) => HttpResponse::Created().json(&post),
                 Err(e) => {
@@ -128,21 +138,19 @@ pub async fn create_post(
 pub async fn update_post_by_id(
     pool: web::types::State<PgPool>,
     post_id: Path<i32>,
-    updated_post: web::types::Json<NewPost>,
+    updated_post: web::types::Json<NewPostStruct>,
 ) -> HttpResponse {
     let post_id = post_id.into_inner();
     let updated_post = updated_post.into_inner();
 
-    match sqlx::query!(
-        "UPDATE posts SET title = $1, content = $2, author_id = $3 WHERE id = $4",
+    match sqlx::query!("UPDATE posts SET title = $1, content = $2, author_id = $3, status = $4 WHERE id = $5",
         updated_post.title,
         updated_post.content,
         updated_post.author_id,
+        updated_post.status as StatusEnum,
         post_id
     )
-    .execute(pool.get_ref())
-    .await
-    {
+    .execute(pool.get_ref()).await {
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(e) => {
             eprintln!("Error updating post by id: {:?}", e);
