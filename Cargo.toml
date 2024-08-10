@@ -15,6 +15,8 @@ sqlx = { version = "0.7", features = [
     "postgres",
     "chrono",
     "time",
+    "macros",
 ] }
 http = "1.1.0"
 chrono = { version = "0.4", features = ["serde"] }
+validator = { version = "0.18", features = ["derive"] }
