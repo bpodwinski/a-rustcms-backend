@@ -2,7 +2,9 @@ use sqlx::PgPool;
 
 use crate::{
     models::posts::posts_table_model::Post,
-    repositories::posts::posts_repository::{insert_post, select_post_by_id},
+    repositories::posts::{
+        insert_post::insert_post, select_post_by_id::select_post_by_id,
+    },
 };
 
 pub async fn create_post_service(
