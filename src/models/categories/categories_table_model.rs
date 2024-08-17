@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
-pub struct Post {
+pub struct Category {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
 
