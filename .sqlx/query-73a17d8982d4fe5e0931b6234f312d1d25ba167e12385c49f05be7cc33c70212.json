@@ -10,7 +10,7 @@
         "Text",
         {
           "Custom": {
-            "name": "status",
+            "name": "posts_status",
             "kind": {
               "Enum": [
                 "Draft",

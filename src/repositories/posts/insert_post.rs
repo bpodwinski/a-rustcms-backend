@@ -1,6 +1,8 @@
 use sqlx::{Acquire, Postgres, Transaction};
 
-use crate::models::posts::{posts_table_model::Post, posts_type_model::Status};
+use crate::models::posts::{
+    posts_table_model::Post, posts_type_model::PostsStatus,
+};
 
 #[derive(sqlx::FromRow)]
 struct PostId {
@@ -17,7 +19,7 @@ pub async fn insert_post(
         post.title,
         post.content,
         post.author_id,
-        post.status.clone() as Status,
+        post.status.clone() as PostsStatus,
         post.date_published
     )
     .fetch_one(&mut *tx.acquire().await?)

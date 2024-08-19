@@ -2,7 +2,7 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use super::posts_type_model::Status;
+use super::posts_type_model::PostsStatus;
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Post {
@@ -18,7 +18,7 @@ pub struct Post {
     #[validate(range(min = 1, message = "Author ID must be greater than 0"))]
     pub author_id: i32,
 
-    pub status: Status,
+    pub status: PostsStatus,
 
     pub date_published: Option<NaiveDateTime>,
 

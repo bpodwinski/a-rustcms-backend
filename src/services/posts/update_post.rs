@@ -1,5 +1,5 @@
 use crate::models::posts::posts_table_model::Post;
-use crate::models::posts::posts_type_model::Status;
+use crate::models::posts::posts_type_model::PostsStatus;
 use crate::repositories::posts::{
     select_post_by_id::select_post_by_id, update_post_by_id::update_post_by_id,
 };
@@ -11,7 +11,7 @@ pub async fn update_post_service(
     post_id: i32,
     title: String,
     content: String,
-    status: Status,
+    status: PostsStatus,
     date_published: Option<NaiveDateTime>,
 ) -> Result<Post, sqlx::Error> {
     let _ = update_post_by_id(

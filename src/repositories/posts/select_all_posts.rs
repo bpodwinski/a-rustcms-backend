@@ -1,6 +1,8 @@
 use sqlx::PgPool;
 
-use crate::models::posts::{posts_table_model::Post, posts_type_model::Status};
+use crate::models::posts::{
+    posts_table_model::Post, posts_type_model::PostsStatus,
+};
 
 #[derive(sqlx::FromRow)]
 struct InsertPostResult {

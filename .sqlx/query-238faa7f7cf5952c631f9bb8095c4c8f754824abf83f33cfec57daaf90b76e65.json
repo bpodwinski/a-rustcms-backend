@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id,\r\n    title,\r\n    content,\r\n    author_id,\r\n    status::text AS \"status!: Status\",\r\n    date_published,\r\n    date_created\r\nFROM posts;",
+  "query": "SELECT id,\r\n    title,\r\n    content,\r\n    author_id,\r\n    status::text AS \"status!: PostsStatus\",\r\n    date_published,\r\n    date_created\r\nFROM posts\r\nWHERE id = $1;",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,7 @@
       },
       {
         "ordinal": 4,
-        "name": "status!: Status",
+        "name": "status!: PostsStatus",
         "type_info": "Text"
       },
       {
@@ -40,7 +40,9 @@
       }
     ],
     "parameters": {
-      "Left": []
+      "Left": [
+        "Int4"
+      ]
     },
     "nullable": [
       false,
@@ -52,5 +54,5 @@
       false
     ]
   },
-  "hash": "c7243522dc9e085febd16337c68a65552167fe38a7ce8edf7288bcba7a1ba175"
+  "hash": "238faa7f7cf5952c631f9bb8095c4c8f754824abf83f33cfec57daaf90b76e65"
 }

@@ -22,14 +22,14 @@ pub async fn create_post_service(
         let post_category = PostsCategories {
             id: None,
             post_id,
-            categories_id: category_id,
+            category_id: category_id,
             date_created: None,
         };
 
         let _ = insert_posts_categories(
             &mut transaction,
             post_category.post_id,
-            post_category.categories_id,
+            post_category.category_id,
         )
         .await?;
 

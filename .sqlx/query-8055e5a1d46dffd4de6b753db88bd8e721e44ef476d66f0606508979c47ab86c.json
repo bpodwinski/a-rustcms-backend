@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO posts_categories (post_id, categories_id)\r\nVALUES ($1, $2)\r\nRETURNING id,\r\n    post_id,\r\n    categories_id,\r\n    date_created;",
+  "query": "INSERT INTO posts_categories (post_id, category_id)\r\nVALUES ($1, $2)\r\nRETURNING id,\r\n    post_id,\r\n    category_id,\r\n    date_created;",
   "describe": {
     "columns": [
       {
@@ -15,7 +15,7 @@
       },
       {
         "ordinal": 2,
-        "name": "categories_id",
+        "name": "category_id",
         "type_info": "Int4"
       },
       {
@@ -37,5 +37,5 @@
       false
     ]
   },
-  "hash": "e63661b12f12eb60f59aec2780f544f6eb4b02fbf581cdf762a9e7d32f06aec0"
+  "hash": "8055e5a1d46dffd4de6b753db88bd8e721e44ef476d66f0606508979c47ab86c"
 }
