@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE posts\r\nSET title = $2,\r\n    content = $3,\r\n    status = $4,\r\n    date_published = $5\r\nWHERE id = $1;",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Text",
+        {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "Draft",
+                "Pending",
+                "Private",
+                "Scheduled",
+                "Published"
+              ]
+            }
+          }
+        },
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "73a17d8982d4fe5e0931b6234f312d1d25ba167e12385c49f05be7cc33c70212"
+}

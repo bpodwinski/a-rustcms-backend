@@ -3,5 +3,4 @@
 .lock
 /.idea/
 /.vscode/
-/.sqlx/
 Cargo.lock
