@@ -3,15 +3,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::models::posts::posts_categories_table_model::PostsCategories;
 use crate::models::posts::posts_table_model::Post;
 use crate::services::posts::create_post::create_post_service;
-
-#[derive(Serialize)]
-struct PostWithCategories {
-    post: Post,
-    categories: Vec<PostsCategories>,
-}
 
 #[derive(Deserialize)]
 struct CreatePostRequest {
@@ -21,12 +14,12 @@ struct CreatePostRequest {
 
 /// Create a new post in the database.
 ///
-/// This function inserts a new row into the `posts` table in the database
-/// with the provided title, content, and author ID.
+/// This function inserts a new row into la table `posts` dans la base de données
+/// avec le titre, le contenu et l'ID de l'auteur fournis.
 ///
 /// # Arguments
 ///
-/// * `pool` - A `PgPool` instance provided by `ntex` pour accéder à la base de données.
+/// * `pool` - Une instance `PgPool` fournie par `ntex` pour accéder à la base de données.
 /// * `request` - Un objet JSON contenant les données du post et les IDs des catégories associées.
 ///
 /// # Returns
@@ -48,12 +41,8 @@ pub async fn create_post_controller(
     }
 
     match create_post_service(pool.get_ref(), post, categories_ids).await {
-        Ok((post, posts_categories)) => {
-            let response = PostWithCategories {
-                post,
-                categories: posts_categories,
-            };
-            HttpResponse::Created().json(&response)
+        Ok(post_with_categories) => {
+            HttpResponse::Created().json(&post_with_categories)
         }
         Err(err) => {
             eprintln!("Failed to create post: {:?}", err);

@@ -1,13 +1,9 @@
 use sqlx::{Acquire, Postgres, Transaction};
 
-use crate::models::posts::{
-    posts_table_model::Post, posts_type_model::PostsStatus,
+use crate::{
+    dto::post_dto::PostId,
+    models::posts::{posts_table_model::Post, posts_type_model::PostsStatus},
 };
-
-#[derive(sqlx::FromRow)]
-struct PostId {
-    id: i32,
-}
 
 pub async fn insert_post(
     tx: &mut Transaction<'_, Postgres>,

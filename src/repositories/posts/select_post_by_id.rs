@@ -4,11 +4,6 @@ use crate::models::posts::{
     posts_table_model::Post, posts_type_model::PostsStatus,
 };
 
-#[derive(sqlx::FromRow)]
-struct InsertPostResult {
-    id: i32,
-}
-
 pub async fn select_post_by_id(
     pool: &PgPool,
     post_id: i32,

@@ -5,7 +5,9 @@ use ntex_cors::Cors;
 mod config;
 mod controllers;
 mod db;
+mod dto;
 mod models;
+
 mod repositories;
 mod routes;
 mod services;
