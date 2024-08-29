@@ -1,5 +1,5 @@
 use ntex::web::{self, HttpResponse};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
 
