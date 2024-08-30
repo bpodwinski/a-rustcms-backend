@@ -1,40 +1,24 @@
-use ntex::web::types::Path;
 use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
-use crate::models::posts_model::{PostStruct, Status};
+use crate::{
+    dto::ErrorMessage, services::posts::get_post_by_id::get_post_by_id_service,
+};
 
-/// Fetch a specific post by its ID.
-///
-/// This function queries the `posts` table in the database for a row with the
-/// specified ID and returns it as JSON.
-///
-/// # Arguments
-///
-/// * `pool` - A `PgPool` instance provided by `ntex` for database access.
-/// * `post_id` - The ID of the post to fetch.
-///
-/// # Returns
-///
-/// A `HttpResponse` containing the post as JSON or an internal server error if the post is not found.
 #[web::get("/posts/{id}")]
-pub async fn get_post_by_id(
+pub async fn get_post_by_id_controller(
     pool: web::types::State<PgPool>,
-    post_id: Path<i32>,
+    post_id: web::types::Path<i32>,
 ) -> HttpResponse {
-    let post_id = post_id.into_inner();
-
-    match sqlx::query_file_as!(
-        PostStruct,
-        "src/sql/get_post_by_id.sql",
-        post_id
-    )
-    .fetch_one(pool.get_ref())
-    .await
-    {
+    match get_post_by_id_service(pool.get_ref(), post_id.into_inner()).await {
         Ok(post) => HttpResponse::Ok().json(&post),
-        Err(e) => {
-            eprintln!("Error fetching post by id: {:?}", e);
+        Err(sqlx::Error::RowNotFound) => {
+            HttpResponse::NotFound().json(&ErrorMessage {
+                error: "Post not found".to_string(),
+            })
+        }
+        Err(err) => {
+            eprintln!("Failed to retrieve post: {:?}", err);
             HttpResponse::InternalServerError().finish()
         }
     }

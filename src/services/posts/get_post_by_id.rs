@@ -6,8 +6,8 @@ use crate::{
 };
 
 pub async fn get_post_by_id_service(
-    pool: PgPool,
+    pool: &PgPool,
     post_id: i32,
 ) -> Result<Post, sqlx::Error> {
-    select_post_by_id(&pool, post_id).await
+    select_post_by_id(pool, post_id).await
 }
