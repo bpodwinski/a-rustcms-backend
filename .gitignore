@@ -2,5 +2,4 @@
 .env
 .lock
 /.idea/
-/.vscode/
 Cargo.lock

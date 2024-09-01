@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": ".."
+    }
+  ],
+  "settings": {
+    "workbench.colorCustomizations": {
+      "activityBar.background": "#283049",
+      "activityBar.activeBackground": "#38456b",
+      "titleBar.activeBackground": "#283049",
+      "editorRuler.foreground": "#ffffff1f",
+      "statusBar.background": "#283049"
+    },
+    "editor.rulers": [80],
+    "rust-analyzer.rustfmt.extraArgs": ["--config", "max_width=80"]
+  }
+}
