@@ -1,6 +1,6 @@
 use crate::dto::{category_dto::CategoryInfo, post_dto::PostWithCategories};
-use crate::models::posts::posts_categories_table_model::PostsCategories;
 use crate::models::posts::posts_table_model::Post;
+use crate::models::posts_categories::posts_categories_table_model::PostsCategories;
 use crate::repositories::posts::insert_post::insert_post;
 use crate::repositories::posts_categories::insert_posts_categories::insert_posts_categories;
 use sqlx::{PgPool, Postgres, Transaction};

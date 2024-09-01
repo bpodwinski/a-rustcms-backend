@@ -1,6 +1,6 @@
 use sqlx::{Acquire, Postgres, Transaction};
 
-use crate::models::posts::posts_categories_table_model::PostsCategories;
+use crate::models::posts_categories::posts_categories_table_model::PostsCategories;
 
 pub async fn insert_posts_categories(
     tx: &mut Transaction<'_, Postgres>,
