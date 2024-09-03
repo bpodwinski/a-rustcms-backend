@@ -1,4 +1,4 @@
-use crate::dto::{category_dto::CategoryInfo, post_dto::PostDTO};
+use crate::dto::{category_dto::CategoryId, post_dto::PostDTO};
 use crate::models::posts::posts_table_model::Post;
 use crate::models::posts_categories::posts_categories_table_model::PostsCategories;
 use crate::repositories::posts::insert_post::insert_post;
@@ -61,7 +61,7 @@ pub async fn create_post_service(
         )
         .await?;
 
-        categories.push(CategoryInfo { category_id });
+        categories.push(CategoryId { id: category_id });
     }
 
     // Commit transaction to make changes permanent

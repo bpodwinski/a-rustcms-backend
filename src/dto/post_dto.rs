@@ -21,13 +21,6 @@ pub struct PostDTO {
     pub categories: Option<serde_json::Value>,
 }
 
-#[derive(Serialize)]
-pub struct CategoryDTO {
-    pub id: i32,
-    pub name: String,
-    pub description: Option<String>,
-}
-
 impl From<Post> for PostDTO {
     fn from(post: Post) -> Self {
         PostDTO {
