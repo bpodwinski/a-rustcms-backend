@@ -12,20 +12,6 @@ struct CreatePostRequest {
     categories_ids: Vec<i32>,
 }
 
-/// Create a new post in the database.
-///
-/// This function inserts a new row into la table `posts` dans la base de données
-/// avec le titre, le contenu et l'ID de l'auteur fournis.
-///
-/// # Arguments
-///
-/// * `pool` - Une instance `PgPool` fournie par `ntex` pour accéder à la base de données.
-/// * `request` - Un objet JSON contenant les données du post et les IDs des catégories associées.
-///
-/// # Returns
-///
-/// Une `HttpResponse` indiquant le résultat de l'opération.
-/// Si elle réussit, elle retourne un statut `Created` avec le post créé et ses catégories.
 #[web::post("/posts")]
 pub async fn create_post_controller(
     pool: web::types::State<PgPool>,

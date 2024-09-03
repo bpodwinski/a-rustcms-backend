@@ -7,7 +7,7 @@ use crate::controllers::{
         delete_post::delete_post_controller,
         get_all_posts::get_all_posts_controller,
         get_post_by_id::get_post_by_id_controller,
-        update_post::update_post_controller,
+        //update_post::update_post_controller,
     },
 };
 
@@ -16,9 +16,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
         web::scope("/api/v1")
             .service(create_post_controller)
             .service(get_all_posts_controller)
-            .service(get_post_by_id_controller)
-            .service(update_post_controller)
-            .service(delete_post_controller)
-            .service(create_category_controller),
+            .service(get_post_by_id_controller) //.service(update_post_controller)
+            .service(delete_post_controller), //.service(create_category_controller),
     );
 }

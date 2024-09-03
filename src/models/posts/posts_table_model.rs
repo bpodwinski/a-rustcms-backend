@@ -4,6 +4,7 @@ use validator::Validate;
 
 use super::posts_type_model::PostsStatus;
 
+/// Represents a blog post with associated metadata and categories.
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Post {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,4 +25,7 @@ pub struct Post {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_created: Option<NaiveDateTime>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub categories: Option<serde_json::Value>,
 }

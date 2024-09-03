@@ -9,19 +9,8 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "preLaunchTask": "SQLx Prepare",
+      "preLaunchTask": "Build and Prepare Debug",
       "sourceLanguages": ["rust"]
-    },
-    {
-      "name": "Cargo Build Release (Windows)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "cargo",
-      "args": ["build", "--release"],
-      "cwd": "${workspaceRoot}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "preLaunchTask": "SQLx Prepare"
     }
   ]
 }

@@ -2,15 +2,44 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "SQLx Prepare",
+      "label": "Build Debug",
+      "detail": "Builds the Rust debug binary",
       "type": "shell",
-      "command": "cargo",
-      "args": ["sqlx", "prepare"],
+      "command": "cargo build",
+      "group": "build",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Build Release",
+      "detail": "Builds the Rust release binary",
+      "type": "shell",
+      "command": "cargo build --release",
+      "group": "build",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "SQLx Prepare",
+      "detail": "Prepares the SQLx query data",
+      "type": "shell",
+      "command": "cargo sqlx prepare",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build and Prepare Debug",
+      "dependsOn": ["SQLx Prepare", "Build Debug"],
       "group": {
         "kind": "build",
         "isDefault": true
-      },
-      "problemMatcher": []
+      }
+    },
+    {
+      "label": "Build and Prepare Release",
+      "dependsOn": ["SQLx Prepare", "Build Release"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
     }
   ]
 }
