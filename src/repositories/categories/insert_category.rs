@@ -7,7 +7,7 @@ pub async fn insert_category(
     pool: &PgPool,
     category: Category,
 ) -> Result<i32, sqlx::Error> {
-    let response = sqlx::query_file_as!(
+    let category = sqlx::query_file_as!(
         CategoryId,
         "src/repositories/categories/insert_category.sql",
         category.parent_id,
@@ -17,5 +17,5 @@ pub async fn insert_category(
     .fetch_one(pool)
     .await?;
 
-    Ok(response.id)
+    Ok(category.id)
 }
