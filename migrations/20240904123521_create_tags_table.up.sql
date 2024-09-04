@@ -1,0 +1,8 @@
+-- Add up migration script here
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(100) DEFAULT NULL UNIQUE,
+    description VARCHAR(500) DEFAULT NULL,
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);

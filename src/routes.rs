@@ -12,6 +12,7 @@ use crate::controllers::{
         get_post_by_id::get_post_by_id_controller,
         //update_post::update_post_controller,
     },
+    tags::create_tag::create_tag_controller,
 };
 
 pub fn init(cfg: &mut web::ServiceConfig) {
@@ -22,6 +23,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .service(get_post_by_id_controller) //.service(update_post_controller)
             .service(delete_post_controller)
             .service(create_category_controller)
-            .service(get_all_categories_controller),
+            .service(get_all_categories_controller)
+            .service(create_tag_controller),
     );
 }
