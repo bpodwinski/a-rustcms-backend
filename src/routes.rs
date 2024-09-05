@@ -2,7 +2,7 @@ use ntex::web;
 
 use crate::controllers::{
     categories::{
-        create_category::create_category_controller,
+        //create_category::create_category_controller,
         get_all_categories::get_all_categories_controller,
     },
     posts::{
@@ -22,7 +22,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .service(get_all_posts_controller)
             .service(get_post_by_id_controller) //.service(update_post_controller)
             .service(delete_post_controller)
-            .service(create_category_controller)
+            //.service(create_category_controller)
             .service(get_all_categories_controller)
             .service(create_tag_controller),
     );
