@@ -4,4 +4,8 @@ INSERT INTO tags (
         description
     )
 VALUES ($1, $2, $3)
-RETURNING id;
+RETURNING id,
+    name,
+    slug,
+    description,
+    date_created;

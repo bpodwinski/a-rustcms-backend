@@ -4,7 +4,7 @@ use validator::Validate;
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Category {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
     #[validate(range(
         min = 1,
@@ -24,17 +24,18 @@ pub struct Category {
     #[validate(length(
         min = 1,
         max = 100,
-        message = "Name must be between 1 and 100 characters."
+        message = "Name must be between 1 and 100 characters"
     ))]
     pub name: String,
 
-    #[validate(length(
-        min = 1,
-        max = 500,
-        message = "Description must be between 1 and 500 characters."
-    ))]
-    pub description: String,
+    pub slug: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[validate(length(
+        max = 500,
+        message = "Description maximum 500 characters"
+    ))]
+    pub description: Option<String>,
+
+    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     pub date_created: Option<NaiveDateTime>,
 }

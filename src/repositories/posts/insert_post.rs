@@ -26,7 +26,7 @@ use crate::{
 /// This function will return an error if there is an issue executing the
 /// SQL query or acquiring the transaction.
 ///
-pub async fn insert_post(
+pub async fn insert_post_repository(
     tx: &mut Transaction<'_, Postgres>,
     post: &Post,
 ) -> Result<i32, sqlx::Error> {
@@ -35,6 +35,7 @@ pub async fn insert_post(
         "src/repositories/posts/insert_post.sql",
         post.title,
         post.content,
+        post.slug,
         post.author_id,
         post.status.clone() as PostsStatus,
         post.date_published

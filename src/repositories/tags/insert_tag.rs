@@ -1,41 +1,30 @@
 use sqlx::PgPool;
 
-use crate::dto::tag_dto::{TagDTO, TagId};
+use crate::models::tags::tags_table_model::TagModel;
 
-/// Inserts a new post into the database and returns the generated post ID.
+/// Inserts a tag into the database
 ///
 /// # Arguments
 ///
-/// * `tx` - A mutable reference to a database transaction. This ensures
-/// that the post insertion is part of a larger transactional operation,
-/// which can be committed or rolled back as a whole.
-/// * `post` - A reference to the `Post` struct containing the data
-/// to be inserted.
+/// * `pool` - A reference to the PostgreSQL connection pool
+/// * `tag_model` - The tag model containing the tag data to be inserted
 ///
 /// # Returns
 ///
-/// Returns a `Result` containing the generated post ID (`i32`) if the
-/// insertion is successful, or a `sqlx::Error` if there is an error during
-/// the query execution.
-///
-/// # Errors
-///
-/// This function will return an error if there is an issue executing the
-/// SQL query or acquiring the transaction.
-///
-pub async fn insert_tag(
+/// A Result containing the inserted TagModel or a sqlx::Error if something goes wrong
+pub async fn insert_tag_repository(
     pool: &PgPool,
-    tag: &TagDTO,
-) -> Result<i32, sqlx::Error> {
-    let result = sqlx::query_file_as!(
-        TagId,
+    tag_model: TagModel,
+) -> Result<TagModel, sqlx::Error> {
+    let tag = sqlx::query_file_as!(
+        TagModel,
         "src/repositories/tags/insert_tag.sql",
-        tag.name,
-        tag.slug,
-        tag.description
+        tag_model.name,
+        tag_model.slug,
+        tag_model.description
     )
     .fetch_one(pool)
     .await?;
 
-    Ok(result.id)
+    Ok(tag)
 }

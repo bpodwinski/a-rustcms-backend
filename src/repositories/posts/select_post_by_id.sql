@@ -1,6 +1,7 @@
 SELECT p.id,
     p.title,
     p.content,
+    p.slug,
     p.author_id,
     p.status::text AS "status!: PostsStatus",
     p.date_published,

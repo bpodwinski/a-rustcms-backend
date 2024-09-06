@@ -16,7 +16,6 @@ pub struct Post {
     ))]
     pub id: Option<i32>,
 
-    #[validate(length(min = 1, message = "Title cannot be empty"))]
     pub title: String,
 
     #[validate(length(
@@ -24,6 +23,13 @@ pub struct Post {
         message = "Content cannot exceed 5000 characters"
     ))]
     pub content: String,
+
+    #[validate(length(
+        min = 1,
+        max = 200,
+        message = "Slug must be between 1 and 200"
+    ))]
+    pub slug: String,
 
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
     #[validate(range(

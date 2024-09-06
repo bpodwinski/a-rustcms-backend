@@ -1,24 +1,27 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use validator::{Validate, ValidationErrors};
 
-use crate::models::tags::tags_table_model::Tag;
-
-#[derive(sqlx::FromRow)]
-pub struct TagId {
-    pub id: i32,
-}
+use crate::models::tags::tags_table_model::TagModel;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct TagDTO {
     pub id: Option<i32>,
     pub name: String,
-    pub slug: Option<String>,
+    pub slug: String,
     pub description: Option<String>,
     pub date_created: Option<NaiveDateTime>,
 }
 
-impl From<Tag> for TagDTO {
-    fn from(tag: Tag) -> Self {
+#[derive(Deserialize)]
+pub struct CreateTagDTO {
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+}
+
+impl From<TagModel> for TagDTO {
+    fn from(tag: TagModel) -> Self {
         TagDTO {
             id: tag.id,
             name: tag.name,
@@ -26,5 +29,22 @@ impl From<Tag> for TagDTO {
             description: tag.description,
             date_created: tag.date_created,
         }
+    }
+}
+
+impl TryFrom<CreateTagDTO> for TagModel {
+    type Error = ValidationErrors;
+
+    fn try_from(dto: CreateTagDTO) -> Result<Self, Self::Error> {
+        let tag = TagModel {
+            id: None,
+            name: dto.name,
+            slug: dto.slug,
+            description: dto.description,
+            date_created: None,
+        };
+
+        tag.validate()?;
+        Ok(tag)
     }
 }

@@ -7,6 +7,7 @@ pub async fn update_post_by_id(
     post_id: i32,
     title: String,
     content: String,
+    slug: String,
     status: PostsStatus,
     date_published: Option<chrono::NaiveDateTime>,
 ) -> Result<u64, sqlx::Error> {
@@ -15,6 +16,7 @@ pub async fn update_post_by_id(
         post_id,
         title,
         content,
+        slug,
         status as PostsStatus,
         date_published
     )

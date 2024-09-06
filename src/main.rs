@@ -7,6 +7,7 @@ mod controllers;
 mod db;
 mod dto;
 mod models;
+mod validators;
 
 mod repositories;
 mod routes;
@@ -35,7 +36,7 @@ async fn main() -> std::io::Result<()> {
             .state(pool.clone())
             .configure(routes::init)
     })
-    .workers(8)
+    .workers(1)
     .bind(("0.0.0.0", 8080))?
     .run()
     .await

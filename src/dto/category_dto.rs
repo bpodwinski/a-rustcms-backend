@@ -13,7 +13,7 @@ pub struct CategoryDTO {
     pub id: Option<i32>,
     pub parent_id: Option<i32>,
     pub name: String,
-    pub description: String,
+    pub description: Option<String>,
     pub date_created: Option<NaiveDateTime>,
 }
 

@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tags (\r\n        name,\r\n        slug,\r\n        description\r\n    )\r\nVALUES ($1, $2, $3)\r\nRETURNING id,\r\n    name,\r\n    slug,\r\n    description,\r\n    date_created;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "date_created",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "c395f7020a3d94df1d785c72995d8f7485a7d40b5c7aa6421dbce1ee8b950dae"
+}

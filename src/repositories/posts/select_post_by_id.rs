@@ -38,6 +38,7 @@ pub async fn select_post_by_id(
         id: Some(row.id),
         title: row.title,
         content: row.content,
+        slug: row.slug,
         author_id: row.author_id,
         status: PostsStatus::from(row.status),
         date_published: row.date_published,

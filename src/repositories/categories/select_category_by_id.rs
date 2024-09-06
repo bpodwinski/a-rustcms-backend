@@ -39,7 +39,7 @@ pub async fn select_category_by_id(
         id: Some(row.id),
         parent_id: row.parent_id,
         name: row.name,
-        description: row.description.unwrap_or_else(|| String::new()),
+        description: Some(row.description.unwrap_or_else(|| String::new())),
         date_created: Some(row.date_created),
     };
 
