@@ -70,7 +70,52 @@ jobs:
 
       # Step 9: Upload build artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rustpress_api
           path: target/release/rustpress_api
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - uses: actions/checkout@v4
+
+      # Step 2: Download build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: rustpress_api
+          path: ./target/release/
+
+      # Step 3: Set environment variable
+      - name: Set environment variables
+        run: |
+          echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
+          echo "API_PORT=${{ secrets.API_PORT }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "CORS_ALLOWED_URL=${{ secrets.CORS_ALLOWED_URL }}" >> $GITHUB_ENV
+
+      # Step 4: Run database migrations (if needed)
+      - name: Run database migrations
+        run: |
+          sqlx migrate run
+
+      # Step 5: Start the API server in the background
+      - name: Run API server in background
+        run: |
+          ./target/release/rustpress_api &
+          echo "Waiting for the API to be ready on port 6988..."
+          for i in {1..24}; do
+            nc -zv localhost 6988 && echo "API is ready" && break
+            echo "Still waiting for API..." && sleep 5
+          done || { echo "API did not start"; exit 1; }
+
+      # Step 6: Run the tests
+      - name: Run tests
+        run: cargo test --verbose --jobs 5
+        env:
+          API_URL: http://localhost
+          API_PORT: 6988
