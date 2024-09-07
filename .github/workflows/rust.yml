@@ -40,9 +40,9 @@ jobs:
       - name: Run API server in background
         run: |
           cargo run --release &
-          echo "Waiting for the API to be ready on port 8080..."
+          echo "Waiting for the API to be ready on port 6988..."
           for i in {1..16}; do
-            nc -zv localhost 8080 && echo "API is ready" && break
+            nc -zv localhost 6988 && echo "API is ready" && break
             echo "Still waiting for API..." && sleep 15
           done
 
@@ -51,4 +51,4 @@ jobs:
         run: cargo test --verbose
         env:
           API_URL: http://localhost
-          API_PORT: 8080
+          API_PORT: 6988
