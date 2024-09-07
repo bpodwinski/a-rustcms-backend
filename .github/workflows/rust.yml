@@ -27,7 +27,7 @@ jobs:
 
       # Step 4: Build the project
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --release --verbose
 
       # Step 5: Run database migrations (if needed)
       - name: Run database migrations
