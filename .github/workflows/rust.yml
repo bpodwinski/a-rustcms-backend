@@ -38,7 +38,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-target-
 
-      # Step 4: Set environment variable
+      # Step 5: Cache SQLx metadata (sqlx-data.json)
+      - name: Cache SQLx data
+        uses: actions/cache@v4
+        with:
+          path: sqlx-data.json
+          key: ${{ runner.os }}-sqlx-data-${{ hashFiles('sqlx-data.json') }}
+          restore-keys: |
+            ${{ runner.os }}-sqlx-data-
+
+      # Step 6: Set environment variable
       - name: Set environment variables
         run: |
           echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
@@ -46,20 +55,20 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
           echo "CORS_ALLOWED_URL=${{ secrets.CORS_ALLOWED_URL }}" >> $GITHUB_ENV
 
-      # Step 5: Install SQLx CLI for managing the database
+      # Step 7: Install SQLx CLI for managing the database
       - name: Install SQLx CLI
         run: cargo install sqlx-cli
 
-      # Step 6: Build the project
+      # Step 8: Build the project
       - name: Build
         run: cargo build --release --verbose
 
-      # Step 7: Run database migrations (if needed)
+      # Step 9: Run database migrations (if needed)
       - name: Run database migrations
         run: |
           sqlx migrate run
 
-      # Step 8: Start the API server in the background
+      # Step 10: Start the API server in the background
       - name: Run API server in background
         run: |
           cargo run --release &
@@ -69,7 +78,7 @@ jobs:
             echo "Still waiting for API..." && sleep 15
           done
 
-      # Step 9: Run the tests
+      # Step 11: Run the tests
       - name: Run tests
         run: cargo test --verbose
         env:
