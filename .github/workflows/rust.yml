@@ -39,10 +39,9 @@ jobs:
         run: |
           cargo run --release &
           echo "Waiting for the API to be ready on port 8080..."
-          # Attendre que le port 8080 soit ouvert
-          for i in {1..30}; do
-            nc -z localhost 8080 && echo "API is ready" && break
-            echo "Waiting for API..." && sleep 1
+          for i in {1..60}; do
+            nc -zv localhost 8080 && echo "API is ready" && break
+            echo "Still waiting for API..." && sleep 2
           done
 
       # Step 7: Run the tests
