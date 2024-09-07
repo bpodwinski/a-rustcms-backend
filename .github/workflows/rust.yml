@@ -20,6 +20,8 @@ jobs:
       # Step 2: Set environment variable
       - name: Set environment variables
         run: |
+          echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
+          echo "API_PORT=${{ secrets.API_PORT }}" >> $GITHUB_ENV
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
           echo "CORS_ALLOWED_URL=${{ secrets.CORS_ALLOWED_URL }}" >> $GITHUB_ENV
 
