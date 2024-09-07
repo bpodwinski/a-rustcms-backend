@@ -39,7 +39,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::init)
     })
     .workers(1)
-    .bind((api_url, api_port))?
+    .bind(("0.0.0.0", api_port))?
     .run()
     .await
 }
