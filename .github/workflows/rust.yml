@@ -38,14 +38,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-target-
 
-      # Step 5: Cache SQLx metadata (sqlx-data.json)
-      - name: Cache SQLx data
+      # Step 5: Cache SQLx CLI installation
+      - name: Cache SQLx CLI
         uses: actions/cache@v4
         with:
-          path: sqlx-data.json
-          key: ${{ runner.os }}-sqlx-data-${{ hashFiles('sqlx-data.json') }}
+          path: ~/.cargo/bin/sqlx
+          key: ${{ runner.os }}-sqlx-cli-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-sqlx-data-
+            ${{ runner.os }}-sqlx-cli-
 
       # Step 6: Set environment variable
       - name: Set environment variables
