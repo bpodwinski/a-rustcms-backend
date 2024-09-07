@@ -22,7 +22,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: rustpress_api
-          path: ./target/release/
 
       # Step 3: Set environment variable
       - name: Set environment variables
