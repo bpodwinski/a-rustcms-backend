@@ -1,6 +1,6 @@
 use sqlx::PgPool;
 
-use crate::dto::category_dto::CategoryDTO;
+use crate::dtos::category_dto::CategoryDTO;
 
 /// Retrieves all categories from the database.
 ///

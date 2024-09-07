@@ -5,13 +5,13 @@ use ntex_cors::Cors;
 mod config;
 mod controllers;
 mod db;
-mod dto;
+mod dtos;
+mod handlers;
 mod models;
-mod validators;
-
 mod repositories;
 mod routes;
 mod services;
+mod validators;
 
 #[ntex::main]
 async fn main() -> std::io::Result<()> {

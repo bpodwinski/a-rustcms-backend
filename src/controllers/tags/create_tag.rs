@@ -1,39 +1,39 @@
-use ntex::web::{self, types::Json, Error, HttpResponse};
-use serde::Serialize;
+use ntex::web::{
+    self, error::JsonPayloadError, types::Json, Error, HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
-    dto::tag_dto::TagDTO, services::tags::create_tag::create_tag_service,
+    dtos::tag_dto::TagDTO, handlers::error::ErrorResponse,
+    services::tags::create_tag::create_tag_service,
 };
-
-#[derive(Serialize)]
-struct ErrorResponse {
-    error: String,
-}
 
 #[web::post("/tags")]
 pub async fn create_tag_controller(
     pool: web::types::State<PgPool>,
-    tag_dto: Result<Json<TagDTO>, web::error::JsonPayloadError>,
+    tag_dto: Result<Json<TagDTO>, JsonPayloadError>,
 ) -> Result<HttpResponse, Error> {
     match tag_dto {
+        // Si la désérialisation a réussi
         Ok(tag_dto) => {
             match create_tag_service(pool.get_ref(), tag_dto.into_inner()).await
             {
                 Ok(created_tag) => {
+                    // Retourner le tag créé avec le statut 201
                     Ok(HttpResponse::Created().json(&created_tag))
                 }
-                Err(err) => {
-                    let error_response = ErrorResponse {
-                        error: format!("Error: {:?}", err),
-                    };
+                Err(service_error) => {
+                    // Gérer les erreurs de validation et de base de données
+                    let error_response = service_error.to_error_response();
                     Ok(HttpResponse::BadRequest().json(&error_response))
                 }
             }
         }
+        // Gérer les erreurs de parsing JSON
         Err(err) => {
             let error_response = ErrorResponse {
-                error: format!("JSON deserialize error: {:?}", err),
+                error: format!("JSON parse error: {}", err),
+                details: None,
             };
             Ok(HttpResponse::BadRequest().json(&error_response))
         }

@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 
 use crate::{
-    dto::category_dto::CategoryId,
+    dtos::category_dto::CategoryId,
     models::categories::categories_table_model::Category,
 };
 
