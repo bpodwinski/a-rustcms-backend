@@ -10,7 +10,8 @@
       "activityBar.activeBackground": "#38456b",
       "titleBar.activeBackground": "#283049",
       "editorRuler.foreground": "#ffffff1f",
-      "statusBar.background": "#283049"
+      "statusBar.background": "#283049",
+      "rustTestHighlight.backgroundColor": "#2758801a"
     },
     "editor.rulers": [
       {
