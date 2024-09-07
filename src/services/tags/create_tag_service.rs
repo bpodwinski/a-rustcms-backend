@@ -2,7 +2,7 @@ use anyhow::Result;
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::handlers::error::ServiceError;
+use crate::handlers::error_handler::ServiceError;
 use crate::{
     dtos::tag_dto::TagDTO, models::tags::tags_table_model::TagModel,
     repositories::tags::insert_tag_repository,

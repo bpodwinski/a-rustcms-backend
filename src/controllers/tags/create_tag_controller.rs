@@ -4,7 +4,7 @@ use ntex::web::{
 use sqlx::PgPool;
 
 use crate::{
-    dtos::tag_dto::TagDTO, handlers::error::ErrorResponse,
+    dtos::tag_dto::TagDTO, handlers::error_handler::ErrorResponse,
     services::tags::create_tag_service::create_tag_service,
 };
 

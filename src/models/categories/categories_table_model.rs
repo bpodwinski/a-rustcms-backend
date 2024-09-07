@@ -1,6 +1,8 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use validator::Validate;
+use validator::{Validate, ValidationError};
+
+use crate::validators::slug_validator::validate_slug;
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Category {
@@ -28,6 +30,7 @@ pub struct Category {
     ))]
     pub name: String,
 
+    #[validate(custom(function = "validate_slug_category"))]
     pub slug: String,
 
     #[validate(length(
@@ -38,4 +41,11 @@ pub struct Category {
 
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     pub date_created: Option<NaiveDateTime>,
+}
+
+fn validate_slug_category(slug: &str) -> Result<(), ValidationError> {
+    let min_length = 1;
+    let max_length = 200;
+
+    validate_slug(&slug, min_length, max_length)
 }
