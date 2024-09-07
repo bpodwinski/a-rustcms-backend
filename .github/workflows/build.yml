@@ -55,16 +55,20 @@ jobs:
             echo "SQLx CLI is already installed"
           fi
 
-      # Step 3: Set environment variable
+      # Step 6: Set environment variable
       - name: Set environment variables
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
 
-      # Step 6: Build the project
+      # Step 7: Build the project
       - name: Build
         run: cargo build --release --verbose
 
-      # Step 7: Upload build artifacts
+      # Step 8: Verify that the build generated the expected files
+      - name: List built files
+        run: ls -alh target/release
+
+      # Step 9: Upload build artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
