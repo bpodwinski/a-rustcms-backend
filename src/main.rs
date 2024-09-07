@@ -17,7 +17,9 @@ mod validators;
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     let pool = db::init_pool().await.expect("Failed to create pool");
-    let cors_allowed_url = crate::config::config::get_cors_allowed_url();
+    let cors_allowed_url = config::config::get_cors_allowed_url();
+    let api_url = config::config::get_api_url();
+    let api_port = config::config::get_api_port();
 
     HttpServer::new(move || {
         App::new()
@@ -37,7 +39,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::init)
     })
     .workers(1)
-    .bind(("0.0.0.0", 8080))?
+    .bind((api_url, api_port))?
     .run()
     .await
 }
