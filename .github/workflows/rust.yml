@@ -64,7 +64,7 @@ jobs:
         run: |
           cargo run --release &
           echo "Waiting for the API to be ready on port 6988..."
-          for i in {1..16}; do
+          for i in {1..4}; do
             nc -zv localhost 6988 && echo "API is ready" && break
             echo "Still waiting for API..." && sleep 15
           done
