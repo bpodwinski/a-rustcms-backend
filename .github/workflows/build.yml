@@ -51,8 +51,9 @@ jobs:
         run: |
           if ! command -v sqlx &> /dev/null; then
             cargo install sqlx-cli
+          else
+            echo "SQLx CLI is already installed"
           fi
-          cargo install sqlx-cli
 
       # Step 6: Build the project
       - name: Build

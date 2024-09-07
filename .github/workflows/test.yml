@@ -1,10 +1,10 @@
-name: Unit Testing
+name: Test
 
 on:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
 
 env:
   CARGO_TERM_COLOR: always
