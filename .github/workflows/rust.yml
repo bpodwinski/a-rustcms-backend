@@ -80,7 +80,7 @@ jobs:
 
       # Step 11: Run the tests
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test --verbose --jobs 5
         env:
           API_URL: http://localhost
           API_PORT: 6988
