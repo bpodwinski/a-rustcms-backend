@@ -26,6 +26,7 @@ pub async fn select(pool: &PgPool) -> Result<Vec<CategoryDTO>, sqlx::Error> {
             id: Some(row.id),
             parent_id: row.parent_id,
             name: row.name,
+            slug: row.slug,
             description: Some(row.description.unwrap_or_else(|| String::new())),
             date_created: Some(row.date_created),
         })

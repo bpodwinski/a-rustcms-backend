@@ -5,7 +5,7 @@ use validator::{Validate, ValidationError};
 use crate::validators::slug_validator::validate_slug;
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
-pub struct Category {
+pub struct CategoryModel {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
     #[validate(range(

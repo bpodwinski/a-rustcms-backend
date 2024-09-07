@@ -54,9 +54,9 @@ mod tests {
 
         // Assert
         assert!(result.is_ok());
-        let inserted_tag = result.unwrap();
-        assert_eq!(inserted_tag.name, "Test Tag");
-        assert_eq!(inserted_tag.slug, "test-tag");
-        assert_eq!(inserted_tag.description.unwrap(), "A test tag description");
+        let tag = result.unwrap();
+        assert_eq!(tag.name, "Test Tag");
+        assert_eq!(tag.slug, "test-tag");
+        assert_eq!(tag.description.unwrap(), "A test tag description");
     }
 }

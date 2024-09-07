@@ -1,9 +1,6 @@
 use sqlx::PgPool;
 
-use crate::{
-    dtos::category_dto::CategoryDTO,
-    models::posts::posts_type_model::PostsStatus,
-};
+use crate::dtos::category_dto::CategoryDTO;
 
 /// Retrieves single post by its ID from the database and maps it to a PostDTO.
 ///
@@ -39,6 +36,7 @@ pub async fn select(
         id: Some(row.id),
         parent_id: row.parent_id,
         name: row.name,
+        slug: row.slug,
         description: Some(row.description.unwrap_or_else(|| String::new())),
         date_created: Some(row.date_created),
     };

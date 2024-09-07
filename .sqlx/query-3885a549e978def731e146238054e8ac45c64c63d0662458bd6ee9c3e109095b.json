@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id,\r\n    parent_id,\r\n    name,\r\n    description,\r\n    date_created\r\nFROM categories\r\nWHERE id = $1;",
+  "query": "SELECT id,\r\n    parent_id,\r\n    name,\r\n    slug,\r\n    description,\r\n    date_created\r\nFROM categories;",
   "describe": {
     "columns": [
       {
@@ -20,27 +20,31 @@
       },
       {
         "ordinal": 3,
-        "name": "description",
+        "name": "slug",
         "type_info": "Varchar"
       },
       {
         "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
         "name": "date_created",
         "type_info": "Timestamp"
       }
     ],
     "parameters": {
-      "Left": [
-        "Int4"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
       true,
       false,
+      false,
       true,
       false
     ]
   },
-  "hash": "62b84c1413fb75523532b1281b918be6210781705518c742b1379bd1f1fccbe5"
+  "hash": "3885a549e978def731e146238054e8ac45c64c63d0662458bd6ee9c3e109095b"
 }
