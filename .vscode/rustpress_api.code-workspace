@@ -12,7 +12,20 @@
       "editorRuler.foreground": "#ffffff1f",
       "statusBar.background": "#283049"
     },
-    "editor.rulers": [80],
+    "editor.rulers": [
+      {
+        "column": 80,
+        "color": "#00ff2a2a"
+      },
+      {
+        "column": 100,
+        "color": "#ffae002a"
+      },
+      {
+        "column": 120,
+        "color": "#ff11002a"
+      }
+    ],
     "rust-analyzer.rustfmt.extraArgs": ["--config", "max_width=80"]
   }
 }
