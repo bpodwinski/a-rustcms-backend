@@ -1,2 +1,2 @@
-pub mod delete_by_post_id;
-pub mod insert_posts_categories;
+pub mod delete_by_post_id_repository;
+pub mod insert_posts_categories_repository;

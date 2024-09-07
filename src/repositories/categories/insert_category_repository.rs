@@ -5,7 +5,7 @@ use crate::{
     models::categories::categories_table_model::Category,
 };
 
-pub async fn insert_category(
+pub async fn insert(
     pool: &PgPool,
     category: Category,
 ) -> Result<i32, sqlx::Error> {

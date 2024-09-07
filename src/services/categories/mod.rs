@@ -1,2 +1,2 @@
-pub mod create_category;
-pub mod get_all_categories;
+pub mod create_category_service;
+pub mod get_all_categories_service;

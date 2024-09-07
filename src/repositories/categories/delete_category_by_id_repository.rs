@@ -19,7 +19,7 @@ use sqlx::PgPool;
 /// This function will return an error if there is an issue executing the
 /// SQL query.
 ///
-pub async fn delete_category_by_id(
+pub async fn delete(
     pool: &PgPool,
     category_id: i32,
 ) -> Result<u64, sqlx::Error> {

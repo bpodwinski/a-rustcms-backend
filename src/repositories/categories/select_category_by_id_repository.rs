@@ -22,7 +22,7 @@ use crate::{
 /// This function will return an error if the post with the specified
 /// `post_id`does not exist, or if there is an issue executing the SQL query.
 ///
-pub async fn select_category_by_id(
+pub async fn select(
     pool: &PgPool,
     category_id: i32,
 ) -> Result<CategoryDTO, sqlx::Error> {

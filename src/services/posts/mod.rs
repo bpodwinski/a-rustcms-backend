@@ -1,5 +1,5 @@
-pub mod create_post;
-pub mod delete_post;
-pub mod get_all_posts;
-pub mod get_post_by_id;
+pub mod create_post_service;
+pub mod delete_post_service;
+pub mod get_all_posts_service;
+pub mod get_post_by_id_service;
 //pub mod update_post;

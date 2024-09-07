@@ -2,7 +2,7 @@ use sqlx::PgPool;
 
 use crate::models::posts::posts_type_model::PostsStatus;
 
-pub async fn update_post_by_id(
+pub async fn update(
     pool: &PgPool,
     post_id: i32,
     title: String,

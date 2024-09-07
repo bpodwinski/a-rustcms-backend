@@ -1,8 +1,8 @@
 use ntex::web;
 
 use crate::controllers::{
-    categories::create_category::create_category_controller,
-    tags::create_tag::create_tag_controller,
+    categories::create_category_controller::create_category_controller,
+    tags::create_tag_controller::create_tag_controller,
 };
 
 pub fn init(cfg: &mut web::ServiceConfig) {

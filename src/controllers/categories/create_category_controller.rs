@@ -3,7 +3,7 @@ use sqlx::PgPool;
 use validator::Validate;
 
 use crate::models::categories::categories_table_model::Category;
-use crate::services::categories::create_category::create_category_service;
+use crate::services::categories::create_category_service::create_category_service;
 
 #[web::post("/categories")]
 pub async fn create_category_controller(

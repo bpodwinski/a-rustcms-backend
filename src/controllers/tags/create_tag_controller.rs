@@ -5,7 +5,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::tag_dto::TagDTO, handlers::error::ErrorResponse,
-    services::tags::create_tag::create_tag_service,
+    services::tags::create_tag_service::create_tag_service,
 };
 
 #[web::post("/tags")]

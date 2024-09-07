@@ -12,7 +12,7 @@ use crate::models::tags::tags_table_model::TagModel;
 /// # Returns
 ///
 /// A Result containing the inserted TagModel or a sqlx::Error if something goes wrong
-pub async fn insert_tag_repository(
+pub async fn insert(
     pool: &PgPool,
     tag_model: TagModel,
 ) -> Result<TagModel, sqlx::Error> {

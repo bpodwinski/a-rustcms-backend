@@ -5,7 +5,7 @@ use validator::Validate;
 use crate::handlers::error::ServiceError;
 use crate::{
     dtos::tag_dto::TagDTO, models::tags::tags_table_model::TagModel,
-    repositories::tags::insert_tag::insert_tag_repository,
+    repositories::tags::insert_tag_repository,
 };
 
 pub async fn create_tag_service(
@@ -22,7 +22,7 @@ pub async fn create_tag_service(
 
     tag_model.validate()?;
 
-    let tag_entity = insert_tag_repository(pool, tag_model).await?;
+    let tag_entity = insert_tag_repository::insert(pool, tag_model).await?;
 
     let result_dto = TagDTO {
         id: tag_entity.id,

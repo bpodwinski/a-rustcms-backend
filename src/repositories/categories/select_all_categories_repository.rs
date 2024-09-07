@@ -13,9 +13,7 @@ use crate::dtos::category_dto::CategoryDTO;
 /// Returns a `Result` containing a vector of `Category` structs if the query
 /// is successful, or a `sqlx::Error` if there is an error during the
 /// query execution.
-pub async fn select_all_categories(
-    pool: &PgPool,
-) -> Result<Vec<CategoryDTO>, sqlx::Error> {
+pub async fn select(pool: &PgPool) -> Result<Vec<CategoryDTO>, sqlx::Error> {
     let rows = sqlx::query_file!(
         "src/repositories/categories/select_all_categories.sql"
     )

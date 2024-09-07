@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO posts (\r\n        title,\r\n        content,\r\n        slug,\r\n        author_id,\r\n        status,\r\n        date_published\r\n    )\r\nVALUES ($1, $2, $3, $4, $5, $6)\r\nRETURNING id;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text",
+        "Varchar",
+        "Int4",
+        {
+          "Custom": {
+            "name": "posts_status",
+            "kind": {
+              "Enum": [
+                "Draft",
+                "Pending",
+                "Private",
+                "Scheduled",
+                "Published"
+              ]
+            }
+          }
+        },
+        "Timestamp"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b70c6e0252db7b33c2b5dcd9e2b4e3a025a638813084dd722905e1db9e59fe42"
+}
