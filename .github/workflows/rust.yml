@@ -39,9 +39,9 @@ jobs:
         run: |
           cargo run --release &
           echo "Waiting for the API to be ready on port 8080..."
-          for i in {1..60}; do
+          for i in {1..16}; do
             nc -zv localhost 8080 && echo "API is ready" && break
-            echo "Still waiting for API..." && sleep 2
+            echo "Still waiting for API..." && sleep 15
           done
 
       # Step 7: Run the tests
