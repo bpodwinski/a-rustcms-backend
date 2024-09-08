@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::models::tags::tags_table_model::TagModel;
