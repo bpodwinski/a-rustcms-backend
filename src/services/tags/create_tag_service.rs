@@ -3,6 +3,7 @@ use sqlx::PgPool;
 use validator::Validate;
 
 use crate::handlers::error_handler::ServiceError;
+use crate::handlers::generate_slug_handler::generate_slug;
 use crate::{
     dtos::tag_dto::TagDTO, models::tags::tags_table_model::TagModel,
     repositories::tags::insert_tag_repository,
@@ -10,8 +11,12 @@ use crate::{
 
 pub async fn create_tag_service(
     pool: &PgPool,
-    tag_dto: TagDTO,
+    mut tag_dto: TagDTO,
 ) -> Result<TagDTO, ServiceError> {
+    if tag_dto.slug.is_empty() {
+        tag_dto.slug = generate_slug(&tag_dto.name);
+    }
+
     let tag_model = TagModel {
         id: None,
         name: tag_dto.name.clone(),

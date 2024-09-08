@@ -32,7 +32,7 @@ pub struct TagModel {
 }
 
 fn validate_slug_tag(slug: &str) -> Result<(), ValidationError> {
-    let min_length = 1;
+    let min_length = 0;
     let max_length = 200;
 
     validate_slug(&slug, min_length, max_length)
