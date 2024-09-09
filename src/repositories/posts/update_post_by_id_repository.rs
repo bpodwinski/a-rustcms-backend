@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::models::posts::posts_type_model::PostsStatus;

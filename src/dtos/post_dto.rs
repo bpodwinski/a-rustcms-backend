@@ -9,6 +9,12 @@ pub struct PostId {
     pub id: i32,
 }
 
+#[derive(Deserialize)]
+pub struct CreatePostDTO {
+    pub post: Post,
+    pub categories_ids: Vec<i32>,
+}
+
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct PostDTO {
     pub id: Option<i32>,

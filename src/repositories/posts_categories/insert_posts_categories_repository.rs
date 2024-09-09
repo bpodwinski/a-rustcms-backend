@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::{Acquire, Postgres, Transaction};
 
 use crate::dtos::posts_categories_dto::PostsCategoriesDTO;

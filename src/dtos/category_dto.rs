@@ -3,11 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::categories::categories_table_model::CategoryModel;
 
-#[derive(sqlx::FromRow)]
-pub struct CategoryId {
-    pub id: i32,
-}
-
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct CategoryDTO {
     pub id: Option<i32>,

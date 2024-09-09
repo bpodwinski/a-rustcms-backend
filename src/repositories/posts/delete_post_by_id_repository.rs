@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 pub async fn delete(pool: &PgPool, post_id: i32) -> Result<u64, sqlx::Error> {

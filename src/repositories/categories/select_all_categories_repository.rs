@@ -1,18 +1,8 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::CategoryDTO;
 
-/// Retrieves all categories from the database.
-///
-/// # Arguments
-///
-/// * `pool` - A reference to the database connection pool.
-///
-/// # Returns
-///
-/// Returns a `Result` containing a vector of `Category` structs if the query
-/// is successful, or a `sqlx::Error` if there is an error during the
-/// query execution.
 pub async fn select(pool: &PgPool) -> Result<Vec<CategoryDTO>, sqlx::Error> {
     let rows = sqlx::query_file!(
         "src/repositories/categories/select_all_categories.sql"

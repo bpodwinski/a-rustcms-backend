@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id,\r\n    parent_id,\r\n    name,\r\n    slug,\r\n    description,\r\n    date_created\r\nFROM categories\r\nWHERE id = $1;",
+  "query": "SELECT id,\r\n    name,\r\n    slug,\r\n    description,\r\n    date_created\r\nFROM tags\r\nWHERE id = $1;",
   "describe": {
     "columns": [
       {
@@ -10,26 +10,21 @@
       },
       {
         "ordinal": 1,
-        "name": "parent_id",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 2,
         "name": "name",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 3,
+        "ordinal": 2,
         "name": "slug",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 4,
+        "ordinal": 3,
         "name": "description",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 5,
+        "ordinal": 4,
         "name": "date_created",
         "type_info": "Timestamp"
       }
@@ -41,12 +36,11 @@
     },
     "nullable": [
       false,
-      true,
       false,
       false,
       true,
       false
     ]
   },
-  "hash": "eafff4517bac083ef33e94cc8d49c2b9364e723375045e2d2edf7bf42a435f2f"
+  "hash": "2d4f5b83142c9edac4f1376547260be9358777ffee01470b1db005ea8820788e"
 }

@@ -1,7 +1,7 @@
 use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
-use crate::services::posts::get_all_posts::get_all_posts_service;
+use crate::services::posts::get_all_posts_service::get_all_posts_service;
 
 #[web::get("/posts")]
 pub async fn get_all_posts_controller(

@@ -1,24 +1,8 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::CategoryDTO;
 
-/// Retrieves single post by its ID from the database and maps it to a PostDTO.
-///
-/// # Arguments
-///
-/// * `pool` - A reference to the database connection pool.
-/// * `post_id` - The ID of the post to retrieve.
-///
-/// # Returns
-///
-/// Returns a `Result` containing a `PostDTO` if the post is found, or a
-/// `sqlx::Error` if there is an error during the query.
-///
-/// # Errors
-///
-/// This function will return an error if the post with the specified
-/// `post_id`does not exist, or if there is an issue executing the SQL query.
-///
 pub async fn select(
     pool: &PgPool,
     category_id: i32,

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::{
@@ -8,7 +9,6 @@ pub async fn select(
     pool: &PgPool,
     post_id: i32,
 ) -> Result<PostDTO, sqlx::Error> {
-    // Execute SQL query to fetch the post with the specified ID
     let row = sqlx::query_file!(
         "src/repositories/posts/select_post_by_id.sql",
         post_id
@@ -16,7 +16,6 @@ pub async fn select(
     .fetch_one(pool)
     .await?;
 
-    // Map the result to a PostDTO
     let post = PostDTO {
         id: Some(row.id),
         title: row.title,

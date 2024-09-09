@@ -1,23 +1,18 @@
 use ntex::web::{self, HttpResponse};
-use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::models::posts::posts_table_model::Post;
-use crate::services::posts::create_post::create_post_service;
-
-#[derive(Deserialize)]
-struct CreatePostRequest {
-    post: Post,
-    categories_ids: Vec<i32>,
-}
+use crate::{
+    dtos::post_dto::CreatePostDTO,
+    services::posts::create_post_service::create_post_service,
+};
 
 #[web::post("/posts")]
 pub async fn create_post_controller(
     pool: web::types::State<PgPool>,
-    request: web::types::Json<CreatePostRequest>,
+    request: web::types::Json<CreatePostDTO>,
 ) -> HttpResponse {
-    let CreatePostRequest {
+    let CreatePostDTO {
         post,
         categories_ids,
     } = request.into_inner();

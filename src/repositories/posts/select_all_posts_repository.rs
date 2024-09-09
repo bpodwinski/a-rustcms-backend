@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::{
@@ -5,13 +6,11 @@ use crate::{
 };
 
 pub async fn select(pool: &PgPool) -> Result<Vec<PostDTO>, sqlx::Error> {
-    // Execute the SQL query to fetch all posts
     let rows =
         sqlx::query_file!("src/repositories/posts/select_all_posts.sql",)
             .fetch_all(pool)
             .await?;
 
-    // Map each row to a PostDTO and collect them into a Vec<PostDTO>
     let posts = rows
         .into_iter()
         .map(|row| PostDTO {

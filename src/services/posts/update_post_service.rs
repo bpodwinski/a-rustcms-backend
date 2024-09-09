@@ -1,10 +1,12 @@
+use anyhow::Result;
+use chrono::NaiveDateTime;
+use sqlx::PgPool;
+
 use crate::models::posts::posts_table_model::Post;
 use crate::models::posts::posts_type_model::PostsStatus;
 use crate::repositories::posts::{
     select_post_by_id::select_post_by_id, update_post_by_id::update_post_by_id,
 };
-use chrono::NaiveDateTime;
-use sqlx::PgPool;
 
 pub async fn update_post_service(
     pool: &PgPool,

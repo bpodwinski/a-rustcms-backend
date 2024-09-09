@@ -1,15 +1,14 @@
+use anyhow::Result;
+use sqlx::{PgPool, Postgres, Transaction};
+
 use crate::{
-    dtos::{
-        category_dto::CategoryId, post_dto::PostDTO,
-        posts_categories_dto::PostsCategoriesDTO,
-    },
+    dtos::{post_dto::PostDTO, posts_categories_dto::PostsCategoriesDTO},
     models::posts::posts_table_model::Post,
     repositories::{
         posts::{insert_post_repository, select_post_by_id_repository},
         posts_categories::insert_posts_categories_repository,
     },
 };
-use sqlx::{PgPool, Postgres, Transaction};
 
 pub async fn create_post_service(
     pool: &PgPool,
@@ -25,11 +24,11 @@ pub async fn create_post_service(
     let mut categories = Vec::new();
 
     // Insert associated categories
-    for category_id in categories_ids {
+    for id in categories_ids {
         let post_category = PostsCategoriesDTO {
             id: None,
             post_id,
-            category_id: category_id,
+            category_id: id,
             date_created: None,
         };
 
@@ -40,7 +39,7 @@ pub async fn create_post_service(
         )
         .await?;
 
-        categories.push(CategoryId { id: category_id });
+        categories.push(id);
     }
 
     // Commit transaction to make changes permanent
