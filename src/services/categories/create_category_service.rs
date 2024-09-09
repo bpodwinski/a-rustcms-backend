@@ -2,19 +2,26 @@ use anyhow::Result;
 use sqlx::PgPool;
 use validator::Validate;
 
+use crate::dtos::category_dto::CreateCategoryDTO;
+use crate::handlers::error_handler::ServiceError;
+use crate::handlers::generate_slug_handler::generate_slug;
 use crate::{
-    dtos::category_dto::CategoryDTO, handlers::error_handler::ServiceError,
+    dtos::category_dto::CategoryDTO,
     models::categories::categories_table_model::CategoryModel,
     repositories::categories::insert_category_repository,
 };
 
 pub async fn create_category_service(
     pool: &PgPool,
-    category_dto: CategoryModel,
+    mut category_dto: CreateCategoryDTO,
 ) -> Result<CategoryDTO, ServiceError> {
+    if category_dto.slug.is_empty() {
+        category_dto.slug = generate_slug(&category_dto.name);
+    }
+
     let category_model = CategoryModel {
         id: None,
-        parent_id: category_dto.parent_id.clone(),
+        parent_id: None,
         name: category_dto.name.clone(),
         slug: category_dto.slug.clone(),
         description: category_dto.description.clone(),

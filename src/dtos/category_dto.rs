@@ -1,7 +1,15 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use validator::{Validate, ValidationErrors};
 
 use crate::models::categories::categories_table_model::CategoryModel;
+
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
+pub struct CreateCategoryDTO {
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+}
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct CategoryDTO {
@@ -23,5 +31,23 @@ impl From<CategoryModel> for CategoryDTO {
             description: category.description,
             date_created: category.date_created,
         }
+    }
+}
+
+impl TryFrom<CreateCategoryDTO> for CategoryModel {
+    type Error = ValidationErrors;
+
+    fn try_from(dto: CreateCategoryDTO) -> Result<Self, Self::Error> {
+        let tag = CategoryModel {
+            id: None,
+            parent_id: None,
+            name: dto.name,
+            slug: dto.slug,
+            description: dto.description,
+            date_created: None,
+        };
+
+        tag.validate()?;
+        Ok(tag)
     }
 }
