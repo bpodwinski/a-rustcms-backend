@@ -35,3 +35,94 @@ pub async fn create_tag_controller(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use ntex::http;
+    use ntex::web::{self, test};
+
+    use super::*;
+    use crate::dtos::tag_dto::CreateTagDTO;
+    use crate::tests::helpers::setup_test_db;
+
+    #[ntex::test]
+    async fn test_create_tag_success() {
+        let pool = setup_test_db().await;
+
+        let tag = CreateTagDTO {
+            name: String::from("New tag"),
+            slug: String::from("new-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        let app = test::init_service(
+            web::App::new()
+                .state(pool.clone())
+                .service(create_tag_controller),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri("/tags")
+            .set_json(&tag)
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+
+        assert_eq!(resp.status(), http::StatusCode::CREATED);
+    }
+
+    #[ntex::test]
+    async fn test_create_tag_validation_failure() {
+        let pool = setup_test_db().await;
+
+        let tag = CreateTagDTO {
+            name: String::new(), // Empty name, should trigger validation failure
+            slug: String::from("new-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        let app = test::init_service(
+            web::App::new()
+                .state(pool.clone())
+                .service(create_tag_controller),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri("/tags")
+            .set_json(&tag)
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+
+        assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
+    }
+
+    #[ntex::test]
+    async fn test_create_tag_service_failure() {
+        let invalid_pool = PgPool::connect("postgres://invalid_url").await;
+
+        let tag = CreateTagDTO {
+            name: String::from("New tag"),
+            slug: String::from("new-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        let app = test::init_service(
+            web::App::new()
+                .state(invalid_pool.unwrap_err())
+                .service(create_tag_controller),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri("/tags")
+            .set_json(&tag)
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+
+        assert_eq!(resp.status(), http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
+}

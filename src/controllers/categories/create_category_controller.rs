@@ -41,36 +41,12 @@ pub async fn create_category_controller(
 
 #[cfg(test)]
 mod tests {
-    use dotenv::dotenv;
     use ntex::http;
     use ntex::web::{self, test};
-    use sqlx::{Executor, Pool, Postgres};
 
     use super::*;
-    use crate::db;
     use crate::dtos::category_dto::CreateCategoryDTO;
-
-    async fn setup_test_db() -> Pool<Postgres> {
-        dotenv().ok();
-        let pool = db::init_pool().await.expect("Failed to create pool");
-
-        pool.execute(
-            r#"
-            CREATE TEMPORARY TABLE categories (
-                id SERIAL PRIMARY KEY,
-                parent_id INTEGER,
-                name VARCHAR NOT NULL,
-                slug VARCHAR NOT NULL,
-                description TEXT,
-                date_created TIMESTAMP NOT NULL DEFAULT NOW()
-            );
-            "#,
-        )
-        .await
-        .unwrap();
-
-        pool
-    }
+    use crate::tests::helpers::setup_test_db;
 
     #[ntex::test]
     async fn test_create_category_success() {

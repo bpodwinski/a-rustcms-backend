@@ -1,8 +1,9 @@
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 
-pub async fn init_pool() -> Result<Pool<Postgres>, sqlx::Error> {
-    let database_url = crate::config::config::get_database_url();
+pub async fn init_pool(
+    database_url: String,
+) -> Result<Pool<Postgres>, sqlx::Error> {
     PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)

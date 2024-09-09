@@ -11,12 +11,15 @@ mod models;
 mod repositories;
 mod routes;
 mod services;
+mod tests;
 mod validators;
 
 #[ntex::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    let pool = db::init_pool().await.expect("Failed to create pool");
+    let pool = db::init_pool(config::config::get_database_url())
+        .await
+        .expect("Failed to create pool");
     let cors_allowed_url = config::config::get_cors_allowed_url();
     let api_url = config::config::get_api_url();
     let api_port = config::config::get_api_port();

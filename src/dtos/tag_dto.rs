@@ -13,7 +13,7 @@ pub struct TagDTO {
     pub date_created: Option<NaiveDateTime>,
 }
 
-#[derive(Deserialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct CreateTagDTO {
     pub name: String,
     pub slug: String,
