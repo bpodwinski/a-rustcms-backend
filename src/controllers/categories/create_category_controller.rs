@@ -50,14 +50,8 @@ mod tests {
 
     #[ntex::test]
     async fn test_create_category_success() {
+        // Arrange
         let pool = setup_test_db().await;
-
-        let category = CreateCategoryDTO {
-            name: String::from("New Category"),
-            slug: String::from("new-category"),
-            description: Some(String::from("Test category description")),
-        };
-
         let app = test::init_service(
             web::App::new()
                 .state(pool.clone())
@@ -65,19 +59,44 @@ mod tests {
         )
         .await;
 
+        let category = CreateCategoryDTO {
+            name: String::from("New Category"),
+            slug: String::from("new-category"),
+            description: Some(String::from("Test category description")),
+        };
+
+        // Act
         let req = test::TestRequest::post()
             .uri("/categories")
             .set_json(&category)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::CREATED);
+
+        // Clean Data
+        sqlx::query!(
+            r#"
+            DELETE FROM categories WHERE name = $1
+            "#,
+            "Test Category"
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to clean up test data");
     }
 
     #[ntex::test]
     async fn test_create_category_validation_failure() {
+        // Arrange
         let pool = setup_test_db().await;
+        let app = test::init_service(
+            web::App::new()
+                .state(pool.clone())
+                .service(create_category_controller),
+        )
+        .await;
 
         let category = CreateCategoryDTO {
             name: String::new(), // Empty name, should trigger validation failure
@@ -85,33 +104,21 @@ mod tests {
             description: Some(String::from("Test category description")),
         };
 
-        let app = test::init_service(
-            web::App::new()
-                .state(pool.clone())
-                .service(create_category_controller),
-        )
-        .await;
-
+        // Act
         let req = test::TestRequest::post()
             .uri("/categories")
             .set_json(&category)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
     }
 
     #[ntex::test]
     async fn test_create_category_service_failure() {
+        // Arrange
         let invalid_pool = PgPool::connect("postgres://invalid_url").await;
-
-        let category = CreateCategoryDTO {
-            name: String::from("New Category"),
-            slug: String::from("new-category"),
-            description: Some(String::from("Test category description")),
-        };
-
         let app = test::init_service(
             web::App::new()
                 .state(invalid_pool.unwrap_err())
@@ -119,13 +126,20 @@ mod tests {
         )
         .await;
 
+        let category = CreateCategoryDTO {
+            name: String::from("New Category"),
+            slug: String::from("new-category"),
+            description: Some(String::from("Test category description")),
+        };
+
+        // Act
         let req = test::TestRequest::post()
             .uri("/categories")
             .set_json(&category)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::INTERNAL_SERVER_ERROR);
     }
 }

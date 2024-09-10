@@ -69,5 +69,16 @@ mod tests {
             category.unwrap().description.as_deref(),
             Some("Description for test category")
         );
+
+        // Clean Data
+        sqlx::query!(
+            r#"
+            DELETE FROM categories WHERE name = $1
+            "#,
+            "Test Category"
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to clean up test data");
     }
 }

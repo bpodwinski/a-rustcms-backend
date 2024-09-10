@@ -47,14 +47,8 @@ mod tests {
 
     #[ntex::test]
     async fn test_create_tag_success() {
+        // Arrange
         let pool = setup_test_db().await;
-
-        let tag = CreateTagDTO {
-            name: String::from("New tag"),
-            slug: String::from("new-tag"),
-            description: Some(String::from("Test tag description")),
-        };
-
         let app = test::init_service(
             web::App::new()
                 .state(pool.clone())
@@ -62,26 +56,38 @@ mod tests {
         )
         .await;
 
+        let tag = CreateTagDTO {
+            name: String::from("Test tag"),
+            slug: String::from("test-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        // Act
         let req = test::TestRequest::post()
             .uri("/tags")
             .set_json(&tag)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::CREATED);
+
+        // Clean Data
+        sqlx::query!(
+            r#"
+            DELETE FROM tags WHERE name = $1
+            "#,
+            "Test Tag"
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to clean up test data");
     }
 
     #[ntex::test]
     async fn test_create_tag_validation_failure() {
+        // Arrange
         let pool = setup_test_db().await;
-
-        let tag = CreateTagDTO {
-            name: String::new(), // Empty name, should trigger validation failure
-            slug: String::from("new-tag"),
-            description: Some(String::from("Test tag description")),
-        };
-
         let app = test::init_service(
             web::App::new()
                 .state(pool.clone())
@@ -89,26 +95,27 @@ mod tests {
         )
         .await;
 
+        let tag = CreateTagDTO {
+            name: String::new(), // Empty name, should trigger validation failure
+            slug: String::from("test-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        // Act
         let req = test::TestRequest::post()
             .uri("/tags")
             .set_json(&tag)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
     }
 
     #[ntex::test]
     async fn test_create_tag_service_failure() {
+        // Arrange
         let invalid_pool = PgPool::connect("postgres://invalid_url").await;
-
-        let tag = CreateTagDTO {
-            name: String::from("New tag"),
-            slug: String::from("new-tag"),
-            description: Some(String::from("Test tag description")),
-        };
-
         let app = test::init_service(
             web::App::new()
                 .state(invalid_pool.unwrap_err())
@@ -116,13 +123,20 @@ mod tests {
         )
         .await;
 
+        let tag = CreateTagDTO {
+            name: String::from("Test tag"),
+            slug: String::from("test-tag"),
+            description: Some(String::from("Test tag description")),
+        };
+
+        // Act
         let req = test::TestRequest::post()
             .uri("/tags")
             .set_json(&tag)
             .to_request();
-
         let resp = test::call_service(&app, req).await;
 
+        // Assert
         assert_eq!(resp.status(), http::StatusCode::INTERNAL_SERVER_ERROR);
     }
 }

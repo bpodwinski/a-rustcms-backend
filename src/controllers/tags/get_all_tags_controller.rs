@@ -68,5 +68,16 @@ mod tests {
             tag.unwrap().description.as_deref(),
             Some("Description for test tag")
         );
+
+        // Clean Data
+        sqlx::query!(
+            r#"
+            DELETE FROM tags WHERE name = $1
+            "#,
+            "Test Tag"
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to clean up test data");
     }
 }
