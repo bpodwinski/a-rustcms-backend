@@ -46,7 +46,7 @@ mod tests {
 
     use super::*;
     use crate::dtos::category_dto::CreateCategoryDTO;
-    use crate::tests::helpers::setup_test_db;
+    use crate::tests::helpers::setup::setup_test_db;
 
     #[ntex::test]
     async fn test_create_category_success() {
