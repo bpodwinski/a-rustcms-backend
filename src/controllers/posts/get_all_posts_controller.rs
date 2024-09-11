@@ -72,10 +72,11 @@ mod tests {
         )
         .expect("Failed to parse date");
 
-        sqlx::query!(
+        let inserted_post = sqlx::query!(
             r#"
             INSERT INTO posts (title, content, slug, author_id, status, date_published) 
             VALUES ($1, $2, $3, $4, $5::posts_status, $6)
+            RETURNING id
             "#,
             "Test Post",
             "Test Post Content",
@@ -84,7 +85,7 @@ mod tests {
             PostsStatus::Published as _,
             custom_date
         )
-        .execute(&pool)
+        .fetch_one(&pool)
         .await
         .expect("Failed to insert test data");
 
@@ -105,5 +106,16 @@ mod tests {
 
         assert!(post.is_some(), "Post not found in the response");
         assert_eq!(post.unwrap().status, PostsStatus::Published);
+
+        // Clean Data
+        sqlx::query!(
+            r#"
+            DELETE FROM posts WHERE id = $1
+            "#,
+            inserted_post.id
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to clean up test data");
     }
 }

@@ -62,7 +62,7 @@ mod tests {
         let category = CreateCategoryDTO {
             name: String::from("New Category"),
             slug: String::from("new-category"),
-            description: Some(String::from("Test category description")),
+            description: Some(String::from("New category description")),
         };
 
         // Act
@@ -80,7 +80,7 @@ mod tests {
             r#"
             DELETE FROM categories WHERE name = $1
             "#,
-            "Test Category"
+            "New Category"
         )
         .execute(&pool)
         .await
@@ -101,7 +101,7 @@ mod tests {
         let category = CreateCategoryDTO {
             name: String::new(), // Empty name, should trigger validation failure
             slug: String::from("new-category"),
-            description: Some(String::from("Test category description")),
+            description: Some(String::from("New category description")),
         };
 
         // Act
@@ -129,7 +129,7 @@ mod tests {
         let category = CreateCategoryDTO {
             name: String::from("New Category"),
             slug: String::from("new-category"),
-            description: Some(String::from("Test category description")),
+            description: Some(String::from("New category description")),
         };
 
         // Act

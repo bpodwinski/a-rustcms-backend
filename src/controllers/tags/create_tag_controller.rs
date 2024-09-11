@@ -57,9 +57,9 @@ mod tests {
         .await;
 
         let tag = CreateTagDTO {
-            name: String::from("Test tag"),
-            slug: String::from("test-tag"),
-            description: Some(String::from("Test tag description")),
+            name: String::from("New tag"),
+            slug: String::from("new-tag"),
+            description: Some(String::from("New tag description")),
         };
 
         // Act
@@ -77,7 +77,7 @@ mod tests {
             r#"
             DELETE FROM tags WHERE name = $1
             "#,
-            "Test Tag"
+            "New tag"
         )
         .execute(&pool)
         .await
