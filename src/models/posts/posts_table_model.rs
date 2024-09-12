@@ -56,7 +56,11 @@ pub struct Post {
 
 fn validate_post_status(status: &PostsStatus) -> Result<(), ValidationError> {
     match status {
-        PostsStatus::Draft | PostsStatus::Published => Ok(()),
+        PostsStatus::Draft
+        | PostsStatus::Pending
+        | PostsStatus::Published
+        | PostsStatus::Private
+        | PostsStatus::Scheduled => Ok(()),
         _ => Err(ValidationError::new("Invalid post status")),
     }
 }
