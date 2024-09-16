@@ -1,5 +1,5 @@
 [package]
-name = "rustpress_api"
+name = "a-rustcms-back"
 version = "0.1.0"
 edition = "2021"
 
