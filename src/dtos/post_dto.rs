@@ -16,8 +16,8 @@ pub struct CreatePostDTO {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DeletePostsDTO {
-    pub posts_ids: Vec<i32>,
+pub struct DeletePostsIdsDTO {
+    pub ids: Vec<i32>,
 }
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]

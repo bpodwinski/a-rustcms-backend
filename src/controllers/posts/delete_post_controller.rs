@@ -2,19 +2,19 @@ use ntex::web::{self, Error, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    dtos::post_dto::DeletePostsDTO, handlers::error_handler::ErrorResponse,
+    dtos::post_dto::DeletePostsIdsDTO, handlers::error_handler::ErrorResponse,
     services::posts::delete_posts_service::delete_posts_service,
 };
 
 #[web::delete("/posts")]
 pub async fn delete_post_controller(
     pool: web::types::State<PgPool>,
-    posts_request: web::types::Json<DeletePostsDTO>,
+    posts_request: web::types::Json<DeletePostsIdsDTO>,
 ) -> Result<HttpResponse, Error> {
-    let posts_ids = posts_request.into_inner().posts_ids;
+    let posts_ids = posts_request.into_inner();
 
     match delete_posts_service(pool.get_ref(), posts_ids).await {
-        Ok(deleted_ids) if !deleted_ids.is_empty() => {
+        Ok(deleted_ids) if !deleted_ids.ids.is_empty() => {
             Ok(HttpResponse::Ok().json(&deleted_ids))
         }
         Ok(_) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
@@ -108,8 +108,8 @@ mod tests {
         // Act
         let req = test::TestRequest::delete()
             .uri(&format!("/posts"))
-            .set_json(&DeletePostsDTO {
-                posts_ids: vec![inserted_post.id],
+            .set_json(&DeletePostsIdsDTO {
+                ids: vec![inserted_post.id],
             })
             .to_request();
         let resp = test::call_service(&app, req).await;
@@ -119,8 +119,8 @@ mod tests {
 
         // Check that the response contains the deleted post ID
         let body = test::read_body(resp).await;
-        let deleted_ids: Vec<i32> =
+        let deleted_ids: DeletePostsIdsDTO =
             from_slice(&body).expect("Failed to parse response body");
-        assert_eq!(deleted_ids, vec![inserted_post.id]);
+        assert_eq!(deleted_ids.ids, vec![inserted_post.id]);
     }
 }
