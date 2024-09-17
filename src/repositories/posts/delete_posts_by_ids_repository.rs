@@ -4,17 +4,20 @@ use sqlx::PgPool;
 pub async fn delete(
     pool: &PgPool,
     posts_ids: Vec<i32>,
-) -> Result<u64, sqlx::Error> {
+) -> Result<Vec<i32>, sqlx::Error> {
     if posts_ids.is_empty() {
-        return Ok(0);
+        return Ok(vec![]);
     }
 
     let result = sqlx::query_file!(
         "src/repositories/posts/delete_posts_by_ids.sql",
         &posts_ids
     )
-    .execute(pool)
+    .fetch_all(pool)
     .await?;
 
-    Ok(result.rows_affected())
+    let deleted_ids: Vec<i32> =
+        result.into_iter().map(|record| record.id).collect();
+
+    Ok(deleted_ids)
 }

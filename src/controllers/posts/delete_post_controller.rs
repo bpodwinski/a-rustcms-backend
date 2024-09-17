@@ -14,11 +14,11 @@ pub async fn delete_post_controller(
     let posts_ids = posts_request.into_inner().posts_ids;
 
     match delete_posts_service(pool.get_ref(), posts_ids).await {
-        Ok(rows_affected) if rows_affected > 0 => {
-            Ok(HttpResponse::NoContent().finish())
+        Ok(deleted_ids) if !deleted_ids.is_empty() => {
+            Ok(HttpResponse::Ok().json(&deleted_ids))
         }
-        Ok(err) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
-            error: format!("Not found: {}", err),
+        Ok(_) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
+            error: "No posts found to delete".to_string(),
             details: None,
         })),
         Err(err) => {
@@ -36,6 +36,7 @@ mod tests {
     use chrono::NaiveDateTime;
     use ntex::http;
     use ntex::web::{self, test};
+    use serde_json::from_slice;
 
     use super::*;
     use crate::models::posts::posts_type_model::PostsStatus;
@@ -114,6 +115,12 @@ mod tests {
         let resp = test::call_service(&app, req).await;
 
         // Assert
-        assert_eq!(resp.status(), http::StatusCode::NO_CONTENT);
+        assert_eq!(resp.status(), http::StatusCode::OK);
+
+        // Check that the response contains the deleted post ID
+        let body = test::read_body(resp).await;
+        let deleted_ids: Vec<i32> =
+            from_slice(&body).expect("Failed to parse response body");
+        assert_eq!(deleted_ids, vec![inserted_post.id]);
     }
 }

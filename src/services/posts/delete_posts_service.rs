@@ -9,16 +9,16 @@ use crate::repositories::{
 pub async fn delete_posts_service(
     pool: &PgPool,
     posts_ids: Vec<i32>,
-) -> Result<u64, sqlx::Error> {
+) -> Result<Vec<i32>, sqlx::Error> {
     // Delete associated categories first
     for post_id in &posts_ids {
         delete_by_post_id_repository::delete(pool, *post_id).await?;
     }
 
     // Delete posts
-    let rows_affected =
+    let deleted_ids =
         delete_posts_by_ids_repository::delete(pool, posts_ids).await?;
 
     // Return the number of affected rows from posts deletion
-    Ok(rows_affected)
+    Ok(deleted_ids)
 }
