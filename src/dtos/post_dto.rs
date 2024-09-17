@@ -15,6 +15,11 @@ pub struct CreatePostDTO {
     pub categories_ids: Vec<i32>,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct DeletePostsDTO {
+    pub posts_ids: Vec<i32>,
+}
+
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct PostDTO {
     pub id: Option<i32>,

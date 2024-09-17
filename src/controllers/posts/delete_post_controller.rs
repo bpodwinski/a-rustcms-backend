@@ -2,16 +2,18 @@ use ntex::web::{self, Error, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    handlers::error_handler::ErrorResponse,
-    services::posts::delete_post_service::delete_post_service,
+    dtos::post_dto::DeletePostsDTO, handlers::error_handler::ErrorResponse,
+    services::posts::delete_posts_service::delete_posts_service,
 };
 
-#[web::delete("/posts/{id}")]
+#[web::delete("/posts")]
 pub async fn delete_post_controller(
     pool: web::types::State<PgPool>,
-    post_id: web::types::Path<i32>,
+    posts_request: web::types::Json<DeletePostsDTO>,
 ) -> Result<HttpResponse, Error> {
-    match delete_post_service(pool.get_ref(), post_id.into_inner()).await {
+    let posts_ids = posts_request.into_inner().posts_ids;
+
+    match delete_posts_service(pool.get_ref(), posts_ids).await {
         Ok(rows_affected) if rows_affected > 0 => {
             Ok(HttpResponse::NoContent().finish())
         }
@@ -104,7 +106,10 @@ mod tests {
 
         // Act
         let req = test::TestRequest::delete()
-            .uri(&format!("/posts/{}", inserted_post.id))
+            .uri(&format!("/posts"))
+            .set_json(&DeletePostsDTO {
+                posts_ids: vec![inserted_post.id],
+            })
             .to_request();
         let resp = test::call_service(&app, req).await;
 
