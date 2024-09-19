@@ -25,6 +25,6 @@ pub async fn get_all_posts_service(
         current_page,
         total_pages,
         total_items,
-        items: posts,
+        data: posts,
     })
 }

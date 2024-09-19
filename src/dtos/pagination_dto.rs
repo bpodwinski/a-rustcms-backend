@@ -23,5 +23,5 @@ pub struct PaginationDTO<T> {
     pub current_page: i64,
     pub total_pages: i64,
     pub total_items: i64,
-    pub items: Vec<T>,
+    pub data: Vec<T>,
 }
