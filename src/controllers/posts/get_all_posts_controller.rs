@@ -26,10 +26,10 @@ pub async fn get_all_posts_controller(
         return HttpResponse::BadRequest().json(&error_response);
     }
 
+    let page = params.page.unwrap_or(1);
     let limit = params.limit.unwrap_or(20);
-    let offset = params.offset.unwrap_or(0);
 
-    match get_all_posts_service(pool.get_ref(), limit, offset).await {
+    match get_all_posts_service(pool.get_ref(), page, limit).await {
         Ok(posts) => HttpResponse::Ok().json(&posts),
         Err(err) => {
             eprintln!("Failed to fetch posts: {:?}", err);

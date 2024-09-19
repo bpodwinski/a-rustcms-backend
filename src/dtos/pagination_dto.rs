@@ -15,7 +15,7 @@ pub struct PaginationParamsDTO {
         max = 2_147_483_647,
         message = "Offset must be between 0 and 2,147,483,647"
     ))]
-    pub offset: Option<i64>,
+    pub page: Option<i64>,
 }
 
 #[derive(Serialize)]
