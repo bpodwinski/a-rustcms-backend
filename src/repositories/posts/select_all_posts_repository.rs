@@ -5,11 +5,18 @@ use crate::{
     dtos::post_dto::PostDTO, models::posts::posts_type_model::PostsStatus,
 };
 
-pub async fn select(pool: &PgPool) -> Result<Vec<PostDTO>, sqlx::Error> {
-    let rows =
-        sqlx::query_file!("src/repositories/posts/select_all_posts.sql",)
-            .fetch_all(pool)
-            .await?;
+pub async fn select(
+    pool: &PgPool,
+    limit: i64,
+    offset: i64,
+) -> Result<Vec<PostDTO>, sqlx::Error> {
+    let rows = sqlx::query_file!(
+        "src/repositories/posts/select_all_posts.sql",
+        limit,
+        offset
+    )
+    .fetch_all(pool)
+    .await?;
 
     let posts = rows
         .into_iter()

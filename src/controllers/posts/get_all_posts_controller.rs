@@ -1,13 +1,35 @@
-use ntex::web::{self, HttpResponse};
+use ntex::web::{self, types::Query, HttpResponse};
 use sqlx::PgPool;
+use validator::Validate;
 
-use crate::services::posts::get_all_posts_service::get_all_posts_service;
+use crate::{
+    dtos::pagination_dto::PaginationParamsDTO,
+    handlers::error_handler::ErrorResponse,
+    services::posts::get_all_posts_service::get_all_posts_service,
+};
 
 #[web::get("/posts")]
 pub async fn get_all_posts_controller(
     pool: web::types::State<PgPool>,
+    params: Query<PaginationParamsDTO>,
 ) -> HttpResponse {
-    match get_all_posts_service(pool.get_ref()).await {
+    // Validation des paramètres après parsing
+    if let Err(validation_errors) = params.validate() {
+        let error_message =
+            format!("Validation error: {:?}", validation_errors);
+
+        let error_response = ErrorResponse {
+            error: error_message,
+            details: None,
+        };
+
+        return HttpResponse::BadRequest().json(&error_response);
+    }
+
+    let limit = params.limit.unwrap_or(20);
+    let offset = params.offset.unwrap_or(0);
+
+    match get_all_posts_service(pool.get_ref(), limit, offset).await {
         Ok(posts) => HttpResponse::Ok().json(&posts),
         Err(err) => {
             eprintln!("Failed to fetch posts: {:?}", err);
@@ -90,7 +112,9 @@ mod tests {
         .expect("Failed to insert test data");
 
         // Act
-        let req = test::TestRequest::get().uri("/posts").to_request();
+        let req = test::TestRequest::get()
+            .uri("/posts?limit=100&offset=0")
+            .to_request();
         let resp = test::call_service(&app, req).await;
 
         // Assert

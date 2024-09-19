@@ -24,4 +24,6 @@ SELECT p.id,
 FROM posts p
     LEFT JOIN posts_categories pc ON p.id = pc.post_id
     LEFT JOIN categories c ON pc.category_id = c.id
-GROUP BY p.id;
+GROUP BY p.id
+ORDER BY p.id DESC
+LIMIT $1 OFFSET $2;

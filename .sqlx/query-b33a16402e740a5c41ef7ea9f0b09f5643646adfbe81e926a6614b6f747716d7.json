@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT p.id,\r\n    p.title,\r\n    p.content,\r\n    p.slug,\r\n    p.author_id,\r\n    p.status::text AS \"status!: PostsStatus\",\r\n    p.date_published,\r\n    p.date_created,\r\n    COALESCE(\r\n        json_agg(\r\n            json_build_object(\r\n                'id',\r\n                c.id,\r\n                'name',\r\n                c.name,\r\n                'description',\r\n                c.description\r\n            )\r\n        ) FILTER (\r\n            WHERE c.id IS NOT NULL\r\n        ),\r\n        '[]'\r\n    ) AS categories\r\nFROM posts p\r\n    LEFT JOIN posts_categories pc ON p.id = pc.post_id\r\n    LEFT JOIN categories c ON pc.category_id = c.id\r\nGROUP BY p.id;",
+  "query": "SELECT p.id,\r\n    p.title,\r\n    p.content,\r\n    p.slug,\r\n    p.author_id,\r\n    p.status::text AS \"status!: PostsStatus\",\r\n    p.date_published,\r\n    p.date_created,\r\n    COALESCE(\r\n        json_agg(\r\n            json_build_object(\r\n                'id',\r\n                c.id,\r\n                'name',\r\n                c.name,\r\n                'description',\r\n                c.description\r\n            )\r\n        ) FILTER (\r\n            WHERE c.id IS NOT NULL\r\n        ),\r\n        '[]'\r\n    ) AS categories\r\nFROM posts p\r\n    LEFT JOIN posts_categories pc ON p.id = pc.post_id\r\n    LEFT JOIN categories c ON pc.category_id = c.id\r\nGROUP BY p.id\r\nORDER BY p.id DESC\r\nLIMIT $1 OFFSET $2;",
   "describe": {
     "columns": [
       {
@@ -50,7 +50,10 @@
       }
     ],
     "parameters": {
-      "Left": []
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
     },
     "nullable": [
       false,
@@ -64,5 +67,5 @@
       null
     ]
   },
-  "hash": "22fb8a332c252c7a438cc08d406bd2cd9cdcf3cb487d390684434bbfa3ad5c8c"
+  "hash": "b33a16402e740a5c41ef7ea9f0b09f5643646adfbe81e926a6614b6f747716d7"
 }
