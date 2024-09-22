@@ -16,6 +16,9 @@ pub struct PaginationParamsDTO {
         message = "Offset must be between 0 and 2,147,483,647"
     ))]
     pub page: Option<i64>,
+
+    pub sort_column: Option<String>,
+    pub sort_order: Option<String>,
 }
 
 #[derive(Serialize)]

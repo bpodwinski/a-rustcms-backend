@@ -7,13 +7,17 @@ use crate::{
 
 pub async fn select(
     pool: &PgPool,
+    sort_column: &str,
+    sort_order: &str,
     limit: i64,
     offset: i64,
 ) -> Result<Vec<PostDTO>, sqlx::Error> {
     let rows = sqlx::query_file!(
         "src/repositories/posts/select_all_posts.sql",
+        sort_column,
+        sort_order,
         limit,
-        offset
+        offset,
     )
     .fetch_all(pool)
     .await?;

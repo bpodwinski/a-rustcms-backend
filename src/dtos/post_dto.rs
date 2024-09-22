@@ -48,3 +48,15 @@ impl From<Post> for PostDTO {
         }
     }
 }
+
+pub enum SortColumn {
+    Id,
+    Title,
+    AuthorId,
+    DatePublished,
+}
+
+pub enum SortOrder {
+    Asc,
+    Desc,
+}

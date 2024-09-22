@@ -3,7 +3,10 @@ use sqlx::PgPool;
 use validator::Validate;
 
 use crate::{
-    dtos::pagination_dto::PaginationParamsDTO,
+    dtos::{
+        pagination_dto::PaginationParamsDTO,
+        post_dto::{SortColumn, SortOrder},
+    },
     handlers::error_handler::ErrorResponse,
     services::posts::get_all_posts_service::get_all_posts_service,
 };
@@ -29,7 +32,28 @@ pub async fn get_all_posts_controller(
     let page = params.page.unwrap_or(1);
     let limit = params.limit.unwrap_or(20);
 
-    match get_all_posts_service(pool.get_ref(), page, limit).await {
+    let sort_column = match params.sort_column.as_deref() {
+        Some("id") => SortColumn::Id,
+        Some("title") => SortColumn::Title,
+        Some("date_published") => SortColumn::DatePublished,
+        _ => SortColumn::Id,
+    };
+
+    let sort_order = match params.sort_order.as_deref() {
+        Some("asc") => SortOrder::Asc,
+        Some("desc") => SortOrder::Desc,
+        _ => SortOrder::Desc,
+    };
+
+    match get_all_posts_service(
+        pool.get_ref(),
+        page,
+        limit,
+        sort_column,
+        sort_order,
+    )
+    .await
+    {
         Ok(posts) => HttpResponse::Ok().json(&posts),
         Err(err) => {
             eprintln!("Failed to fetch posts: {:?}", err);
