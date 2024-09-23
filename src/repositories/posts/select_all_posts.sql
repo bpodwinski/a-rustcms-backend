@@ -3,7 +3,7 @@ SELECT p.id,
     p.content,
     p.slug,
     p.author_id,
-    p.status::text AS "status!: PostsStatus",
+    p.status,
     p.date_published,
     p.date_created,
     COALESCE(
@@ -25,5 +25,3 @@ FROM posts p
     LEFT JOIN posts_categories pc ON p.id = pc.post_id
     LEFT JOIN categories c ON pc.category_id = c.id
 GROUP BY p.id
-ORDER BY $1 $2
-LIMIT $3 OFFSET $4;

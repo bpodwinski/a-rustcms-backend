@@ -42,7 +42,7 @@ pub async fn get_all_posts_controller(
     let sort_order = match params.sort_order.as_deref() {
         Some("asc") => SortOrder::Asc,
         Some("desc") => SortOrder::Desc,
-        _ => SortOrder::Desc,
+        _ => SortOrder::Asc,
     };
 
     match get_all_posts_service(

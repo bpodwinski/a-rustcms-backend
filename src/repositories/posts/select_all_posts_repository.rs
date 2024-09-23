@@ -12,27 +12,30 @@ pub async fn select(
     limit: i64,
     offset: i64,
 ) -> Result<Vec<PostDTO>, sqlx::Error> {
-    let rows = sqlx::query_file!(
-        "src/repositories/posts/select_all_posts.sql",
-        sort_column,
-        sort_order,
-        limit,
-        offset,
-    )
-    .fetch_all(pool)
-    .await?;
+    let base_query = include_str!("select_all_posts.sql");
+
+    let query = format!(
+        "{} ORDER BY {} {} LIMIT $1 OFFSET $2",
+        base_query, sort_column, sort_order
+    );
+
+    let rows = sqlx::query_as::<_, PostDTO>(&query)
+        .bind(limit)
+        .bind(offset)
+        .fetch_all(pool)
+        .await?;
 
     let posts = rows
         .into_iter()
         .map(|row| PostDTO {
-            id: Some(row.id),
+            id: row.id,
             title: row.title,
             content: row.content,
             slug: row.slug,
             author_id: row.author_id,
             status: PostsStatus::from(row.status),
             date_published: row.date_published,
-            date_created: Some(row.date_created),
+            date_created: row.date_created,
             categories: row.categories,
         })
         .collect();
