@@ -6,24 +6,6 @@ use crate::{
     repositories::{BindValue, QueryBuilder},
 };
 
-/* pub async fn insert(
-    pool: &PgPool,
-    category_model: CategoryModel,
-) -> Result<CategoryModel, sqlx::Error> {
-    let category = sqlx::query_file_as!(
-        CategoryModel,
-        "src/repositories/categories/insert_category.sql",
-        category_model.parent_id,
-        category_model.name,
-        category_model.slug,
-        category_model.description
-    )
-    .fetch_one(pool)
-    .await?;
-
-    Ok(category)
-} */
-
 pub async fn insert(
     pool: &PgPool,
     category_model: CategoryModel,
@@ -32,16 +14,14 @@ pub async fn insert(
         .table("categories")
         .fields(&["parent_id", "name", "slug", "description"])
         .values(vec![
-            match category_model.parent_id {
-                Some(id) => BindValue::Int(id),
-                None => BindValue::Null,
-            },
+            category_model
+                .parent_id
+                .map_or(BindValue::Null, BindValue::Int),
             BindValue::Text(category_model.name),
             BindValue::Text(category_model.slug),
-            match category_model.description {
-                Some(desc) => BindValue::Text(desc),
-                None => BindValue::Null,
-            },
+            category_model
+                .description
+                .map_or(BindValue::Null, BindValue::Text),
         ])
         .insert()
         .await?;
