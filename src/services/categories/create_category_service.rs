@@ -21,7 +21,7 @@ pub async fn create_category_service(
 
     let category_model = CategoryModel {
         id: None,
-        parent_id: None,
+        parent_id: category_dto.parent_id.clone(),
         name: category_dto.name.clone(),
         slug: category_dto.slug.clone(),
         description: category_dto.description.clone(),

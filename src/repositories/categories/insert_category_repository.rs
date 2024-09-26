@@ -1,9 +1,9 @@
 use anyhow::Result;
-use sqlx::PgPool;
+use sqlx::*;
 
 use crate::{
     models::categories::categories_table_model::CategoryModel,
-    repositories::QueryBuilder,
+    repositories::{BindValue, QueryBuilder},
 };
 
 /* pub async fn insert(
@@ -27,20 +27,21 @@ use crate::{
 pub async fn insert(
     pool: &PgPool,
     category_model: CategoryModel,
-) -> Result<CategoryModel, sqlx::Error> {
+) -> Result<CategoryModel, Error> {
     let result = QueryBuilder::<CategoryModel>::new(&pool)
         .table("categories")
         .fields(&["parent_id", "name", "slug", "description"])
-        .values(&[
-            &category_model
-                .parent_id
-                .map(|id| id.to_string())
-                .unwrap_or_else(|| "NULL".to_string()),
-            &category_model.name,
-            &category_model.slug,
-            &category_model
-                .description
-                .unwrap_or_else(|| "NULL".to_string()),
+        .values(vec![
+            match category_model.parent_id {
+                Some(id) => BindValue::Int(id),
+                None => BindValue::Null,
+            },
+            BindValue::Text(category_model.name),
+            BindValue::Text(category_model.slug),
+            match category_model.description {
+                Some(desc) => BindValue::Text(desc),
+                None => BindValue::Null,
+            },
         ])
         .insert()
         .await?;

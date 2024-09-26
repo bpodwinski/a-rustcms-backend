@@ -6,6 +6,7 @@ use crate::models::categories::categories_table_model::CategoryModel;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct CreateCategoryDTO {
+    pub parent_id: Option<i32>,
     pub name: String,
     pub slug: String,
     pub description: Option<String>,
@@ -38,16 +39,16 @@ impl TryFrom<CreateCategoryDTO> for CategoryModel {
     type Error = ValidationErrors;
 
     fn try_from(dto: CreateCategoryDTO) -> Result<Self, Self::Error> {
-        let tag = CategoryModel {
+        let category = CategoryModel {
             id: None,
-            parent_id: None,
+            parent_id: dto.parent_id,
             name: dto.name,
             slug: dto.slug,
             description: dto.description,
             date_created: None,
         };
 
-        tag.validate()?;
-        Ok(tag)
+        category.validate()?;
+        Ok(category)
     }
 }

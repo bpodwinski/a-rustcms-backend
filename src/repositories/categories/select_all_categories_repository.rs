@@ -1,9 +1,9 @@
 use anyhow::Result;
-use sqlx::PgPool;
+use sqlx::*;
 
 use crate::{dtos::category_dto::CategoryDTO, repositories::QueryBuilder};
 
-pub async fn select(pool: &PgPool) -> Result<Vec<CategoryDTO>, sqlx::Error> {
+pub async fn select(pool: &PgPool) -> Result<Vec<CategoryDTO>, Error> {
     let result = QueryBuilder::<CategoryDTO>::new(&pool)
         .table("categories")
         .fields(&[

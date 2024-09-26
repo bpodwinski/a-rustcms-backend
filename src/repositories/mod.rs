@@ -1,15 +1,22 @@
-use sqlx::{FromRow, PgPool};
+use postgres::PgRow;
+use sqlx::*;
 
 pub mod categories;
 pub mod posts;
 pub mod posts_categories;
 pub mod tags;
 
+pub enum BindValue {
+    Int(i32),
+    Text(String),
+    Null,
+}
+
 pub struct QueryBuilder<'a, T> {
     pool: &'a PgPool,
     table: String,
     fields: Vec<String>,
-    values: Vec<String>,
+    values: Vec<BindValue>,
     limit: Option<i64>,
     offset: Option<i64>,
     query_type: QueryType,
@@ -24,7 +31,7 @@ pub enum QueryType {
 
 impl<'a, T> QueryBuilder<'a, T>
 where
-    T: for<'r> FromRow<'r, sqlx::postgres::PgRow> + Send + Unpin,
+    T: for<'r> sqlx::FromRow<'r, PgRow> + Send + Unpin,
 {
     // Initialisation du QueryBuilder avec une pool de connexion
     pub fn new(pool: &'a PgPool) -> Self {
@@ -53,8 +60,8 @@ where
     }
 
     // Définir les valeurs pour une requête d'insertion
-    pub fn values(mut self, values: &[&str]) -> Self {
-        self.values = values.iter().map(|&v| v.to_string()).collect();
+    pub fn values(mut self, values: Vec<BindValue>) -> Self {
+        self.values = values;
         self.query_type = QueryType::Insert;
         self
     }
@@ -72,7 +79,7 @@ where
     }
 
     // Construire et exécuter la requête
-    pub async fn select(self) -> Result<Vec<T>, sqlx::Error> {
+    pub async fn select(self) -> Result<Vec<T>, Error> {
         // Construction de la requête
         let mut query =
             format!("SELECT {} FROM {}", self.fields.join(", "), self.table);
@@ -88,34 +95,47 @@ where
         }
 
         // Exécution de la requête SQL et récupération des résultats
-        let rows = sqlx::query_as::<_, T>(&query).fetch_all(self.pool).await?;
+        let rows = query_as::<_, T>(&query).fetch_all(self.pool).await?;
 
         Ok(rows)
     }
 
-    // Construire et exécuter une requête d'insertion
-    pub async fn insert(self) -> Result<T, sqlx::Error> {
+    // Requête d'insertion
+    pub async fn insert(self) -> Result<T, Error> {
         if self.query_type != QueryType::Insert {
-            return Err(sqlx::Error::RowNotFound);
+            return Err(Error::RowNotFound);
         }
 
-        // Construire la requête d'insertion
         let fields_str = self.fields.join(", ");
-        let placeholders: Vec<String> =
-            (1..=self.values.len()).map(|i| format!("${}", i)).collect();
-        let placeholders_str = placeholders.join(", ");
+        let placeholders_str = (1..=self.values.len())
+            .map(|i| format!("${}", i))
+            .collect::<Vec<String>>()
+            .join(", ");
 
         let query = format!(
             "INSERT INTO {} ({}) VALUES ({}) RETURNING *",
             self.table, fields_str, placeholders_str
         );
 
-        // Exécuter la requête d'insertion
-        let affected_rows = sqlx::query_as(&query)
-            .bind(self.values)
-            .fetch_one(self.pool)
-            .await?;
+        let mut sql_query = query_as::<_, T>(&query);
 
-        Ok(affected_rows)
+        // Lier chaque valeur en fonction de son type
+        for value in &self.values {
+            match value {
+                BindValue::Int(val) => {
+                    sql_query = sql_query.bind(val);
+                }
+                BindValue::Text(val) => {
+                    sql_query = sql_query.bind(val);
+                }
+                BindValue::Null => {
+                    sql_query = sql_query.bind(None::<i32>);
+                }
+            }
+        }
+
+        let row = sql_query.fetch_one(self.pool).await?;
+
+        Ok(row)
     }
 }

@@ -60,6 +60,7 @@ mod tests {
         .await;
 
         let category = CreateCategoryDTO {
+            parent_id: Some(10),
             name: String::from("New Category"),
             slug: String::from("new-category"),
             description: Some(String::from("New category description")),
@@ -99,6 +100,7 @@ mod tests {
         .await;
 
         let category = CreateCategoryDTO {
+            parent_id: Some(10),
             name: String::new(), // Empty name, should trigger validation failure
             slug: String::from("new-category"),
             description: Some(String::from("New category description")),
@@ -127,6 +129,7 @@ mod tests {
         .await;
 
         let category = CreateCategoryDTO {
+            parent_id: Some(10),
             name: String::from("New Category"),
             slug: String::from("new-category"),
             description: Some(String::from("New category description")),
