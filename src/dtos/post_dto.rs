@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
-use crate::models::posts::posts_table_model::Post;
+use crate::models::posts::posts_table_model::PostModel;
 use crate::models::posts::posts_type_model::PostsStatus;
 
 #[derive(sqlx::FromRow)]
@@ -11,7 +11,7 @@ pub struct PostId {
 
 #[derive(Deserialize)]
 pub struct CreatePostDTO {
-    pub post: Post,
+    pub post: PostModel,
     pub categories_ids: Vec<i32>,
 }
 
@@ -33,8 +33,8 @@ pub struct PostDTO {
     pub categories: Option<serde_json::Value>,
 }
 
-impl From<Post> for PostDTO {
-    fn from(post: Post) -> Self {
+impl From<PostModel> for PostDTO {
+    fn from(post: PostModel) -> Self {
         PostDTO {
             id: post.id,
             title: post.title,

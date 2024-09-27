@@ -5,10 +5,10 @@ use validator::Validate;
 use crate::dtos::category_dto::CreateCategoryDTO;
 use crate::handlers::error_handler::ServiceError;
 use crate::handlers::generate_slug_handler::generate_slug;
+use crate::repositories::categories_repository::insert_category;
 use crate::{
     dtos::category_dto::CategoryDTO,
     models::categories::categories_table_model::CategoryModel,
-    repositories::categories::insert_category_repository,
 };
 
 pub async fn create_category_service(
@@ -30,8 +30,7 @@ pub async fn create_category_service(
 
     category_model.validate()?;
 
-    let category_entity =
-        insert_category_repository::insert(pool, category_model).await?;
+    let category_entity = insert_category(pool, category_model).await?;
 
     let result_dto = CategoryDTO {
         id: category_entity.id,

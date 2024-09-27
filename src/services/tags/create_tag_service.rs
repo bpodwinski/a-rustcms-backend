@@ -4,10 +4,8 @@ use validator::Validate;
 
 use crate::handlers::error_handler::ServiceError;
 use crate::handlers::generate_slug_handler::generate_slug;
-use crate::{
-    dtos::tag_dto::TagDTO, models::tags::tags_table_model::TagModel,
-    repositories::tags::insert_tag_repository,
-};
+use crate::repositories::tags_repository::insert_tag;
+use crate::{dtos::tag_dto::TagDTO, models::tags::tags_table_model::TagModel};
 
 pub async fn create_tag_service(
     pool: &PgPool,
@@ -27,7 +25,7 @@ pub async fn create_tag_service(
 
     tag_model.validate()?;
 
-    let tag_entity = insert_tag_repository::insert(pool, tag_model).await?;
+    let tag_entity = insert_tag(pool, tag_model).await?;
 
     let result_dto = TagDTO {
         id: tag_entity.id,

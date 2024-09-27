@@ -8,7 +8,7 @@ use super::posts_type_model::PostsStatus;
 
 /// Represents a blog post with associated metadata and categories.
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
-pub struct Post {
+pub struct PostModel {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
     #[validate(range(

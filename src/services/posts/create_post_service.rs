@@ -3,23 +3,19 @@ use sqlx::{PgPool, Postgres, Transaction};
 
 use crate::{
     dtos::{post_dto::PostDTO, posts_categories_dto::PostsCategoriesDTO},
-    models::posts::posts_table_model::Post,
-    repositories::{
-        posts::{insert_post_repository, select_post_by_id_repository},
-        posts_categories::insert_posts_categories_repository,
-    },
+    models::posts::posts_table_model::PostModel,
+    repositories::posts_repository::insert_post,
 };
 
 pub async fn create_post_service(
     pool: &PgPool,
-    post: Post,
+    post: PostModel,
     categories_ids: Vec<i32>,
 ) -> Result<PostDTO, sqlx::Error> {
     let mut transaction: Transaction<'_, Postgres> = pool.begin().await?;
 
     // Insert the post into database and retrieve post ID
-    let post_id =
-        insert_post_repository::insert(&mut transaction, &post).await?;
+    let post_id = insert_post(&mut transaction, &post).await?;
 
     let mut categories = Vec::new();
 
@@ -46,7 +42,7 @@ pub async fn create_post_service(
     transaction.commit().await?;
 
     // Retrieve post into database
-    let post = select_post_by_id_repository::select(pool, post_id).await?;
+    let post = select_posts(pool, post_id).await?;
 
     Ok(post)
 }
