@@ -1,4 +1,3 @@
-use anyhow::Result as AnyhowResult;
 use ntex::web::{self, types::Json, HttpResponse};
 use sqlx::PgPool;
 
@@ -22,11 +21,9 @@ pub async fn create_category_controller(
     pool: web::types::State<PgPool>,
     category_dto: Json<CreateCategoryDTO>,
 ) -> Result<HttpResponse, web::Error> {
-    let result: AnyhowResult<_> =
-        create_category_service(pool.get_ref(), category_dto.into_inner())
-            .await;
-
-    match result {
+    match create_category_service(pool.get_ref(), category_dto.into_inner())
+        .await
+    {
         Ok(created_category) => {
             Ok(HttpResponse::Created().json(&created_category))
         }

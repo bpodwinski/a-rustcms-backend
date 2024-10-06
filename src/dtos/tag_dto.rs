@@ -5,15 +5,13 @@ use validator::{Validate, ValidationErrors};
 
 use crate::models::tags::tags_table_model::TagModel;
 
-#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
-pub struct TagDTO {
-    pub id: Option<i32>,
-    pub name: String,
-    pub slug: String,
-    pub description: Option<String>,
-    pub date_created: Option<NaiveDateTime>,
+/// Batch deletion of tags
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct DeleteTagIdsDTO {
+    pub ids: Vec<i32>,
 }
 
+/// Creating a tag
 #[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct CreateTagDTO {
     pub name: String,
@@ -21,6 +19,36 @@ pub struct CreateTagDTO {
     pub description: Option<String>,
 }
 
+/// Converts `CreateTagDTO` to `TagModel`
+impl TryFrom<CreateTagDTO> for TagModel {
+    type Error = ValidationErrors;
+
+    fn try_from(dto: CreateTagDTO) -> Result<Self, Self::Error> {
+        let tag = TagModel {
+            id: None,
+            name: dto.name,
+            slug: dto.slug,
+            description: dto.description,
+            date_created: None,
+        };
+
+        tag.validate()?;
+        Ok(tag)
+    }
+}
+
+/// Full tag data
+#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
+pub struct TagDTO {
+    pub id: Option<i32>,
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+    #[schema(value_type = String, format = "date-time", example = "2022-01-01T00:00:00")]
+    pub date_created: Option<NaiveDateTime>,
+}
+
+/// Converts `TagModel` to `TagDTO`
 impl From<TagModel> for TagDTO {
     fn from(tag: TagModel) -> Self {
         TagDTO {
@@ -33,16 +61,17 @@ impl From<TagModel> for TagDTO {
     }
 }
 
-impl TryFrom<CreateTagDTO> for TagModel {
+/// Converts `TagDTO` to `TagModel`
+impl TryFrom<TagDTO> for TagModel {
     type Error = ValidationErrors;
 
-    fn try_from(dto: CreateTagDTO) -> Result<Self, Self::Error> {
+    fn try_from(dto: TagDTO) -> Result<Self, Self::Error> {
         let tag = TagModel {
-            id: None,
+            id: dto.id,
             name: dto.name,
             slug: dto.slug,
             description: dto.description,
-            date_created: None,
+            date_created: dto.date_created,
         };
 
         tag.validate()?;

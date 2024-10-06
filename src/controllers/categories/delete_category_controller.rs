@@ -4,7 +4,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::category_dto::DeleteCategoryIdsDTO,
-    middlewares::error_middleware::ErrorResponse,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::categories_service::delete_category_service,
 };
 
@@ -15,8 +15,8 @@ use crate::{
     request_body = DeleteCategoryIdsDTO,
     responses(
         (status = 200, description = "Categories deleted", body = i32),
-        (status = 400, description = "Validation Error", body = ErrorResponse),
-        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
     )
 )]
 #[web::delete("/categories")]
@@ -31,12 +31,6 @@ pub async fn delete_category_controller(
     .await
     {
         Ok(deleted_ids) => Ok(HttpResponse::Ok().json(&deleted_ids)),
-        Err(_) => Ok(HttpResponse::InternalServerError().json(
-            &ErrorResponse::new(
-                "server_error",
-                Some("Internal server error"),
-                None,
-            ),
-        )),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }

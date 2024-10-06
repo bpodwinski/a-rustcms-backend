@@ -1,46 +1,31 @@
-use ntex::web::{
-    self, error::JsonPayloadError, types::Json, Error, HttpResponse,
-};
+use ntex::web::{self, types::Json, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    dtos::tag_dto::TagDTO, handlers::error_handler::ErrorResponse,
-    services::tags::create_tag_service::create_tag_service,
+    dtos::tag_dto::CreateTagDTO,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::tags_service::create_tag_service,
 };
 
 #[utoipa::path(
-  post,
-  path = "/tags",
-  responses(
-    (status = 201, description = "Created", body = [CreateCategoryDTO]),
-    (status = 500, description = "Internal Server Error")
-  ),
+    post,
+    path = "/tags",
+    tag = "Tags",
+    request_body = CreateTagDTO,
+    responses(
+        (status = 201, description = "Create tag", body = TagDTO),
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    ),
 )]
 #[web::post("/tags")]
 pub async fn create_tag_controller(
     pool: web::types::State<PgPool>,
-    tag_dto: Result<Json<TagDTO>, JsonPayloadError>,
-) -> Result<HttpResponse, Error> {
-    match tag_dto {
-        Ok(tag_dto) => {
-            match create_tag_service(pool.get_ref(), tag_dto.into_inner()).await
-            {
-                Ok(created_tag) => {
-                    Ok(HttpResponse::Created().json(&created_tag))
-                }
-                Err(service_error) => {
-                    let error_response = service_error.to_error_response();
-                    Ok(HttpResponse::BadRequest().json(&error_response))
-                }
-            }
-        }
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+    tag_dto: Json<CreateTagDTO>,
+) -> Result<HttpResponse, web::Error> {
+    match create_tag_service(pool.get_ref(), tag_dto.into_inner()).await {
+        Ok(created_tag) => Ok(HttpResponse::Created().json(&created_tag)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 

@@ -3,20 +3,29 @@ use ntex::web;
 use std::sync::Arc;
 use utoipa::OpenApi;
 
-use crate::{dtos::category_dto::{CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO}, middlewares::error_middleware::Error};
+use crate::{
+    dtos::{
+        category_dto::{CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO},
+        tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO},
+    },
+    middlewares::error_middleware::Error,
+};
 
 /// Main structure to generate OpenAPI documentation
 #[derive(OpenApi)]
 #[openapi(
     paths(
         crate::controllers::categories::create_category_controller::create_category_controller,
-        //crate::controllers::categories::get_all_categories_controller::get_all_categories_controller,
-        //crate::controllers::categories::get_category_by_id_controller::get_category_by_id_controller,
-        //crate::controllers::categories::delete_category_controller::delete_category_controller,
-        //crate::controllers::categories::update_category_controller::update_category_controller,
-        
+        crate::controllers::categories::get_all_categories_controller::get_all_categories_controller,
+        crate::controllers::categories::get_category_by_id_controller::get_category_by_id_controller,
+        crate::controllers::categories::delete_category_controller::delete_category_controller,
+        crate::controllers::categories::update_category_controller::update_category_controller,
+        crate::controllers::tags::create_tag_controller::create_tag_controller,
+        crate::controllers::tags::delete_tag_controller::delete_tag_controller,
+        crate::controllers::tags::get_tag_by_id_controller::get_tag_by_id_controller,
+        crate::controllers::tags::get_all_tags_controller::get_all_tags_controller,
     ),
-    components(schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO)),
+    components(schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO, TagDTO, CreateTagDTO, DeleteTagIdsDTO)),
     servers(
         (url = "/api/v1", description = "API v1")
     )

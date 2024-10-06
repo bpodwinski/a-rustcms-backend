@@ -1,11 +1,10 @@
 use anyhow::Result;
 use ntex::web::{self, types::Json, HttpResponse};
 use sqlx::PgPool;
-use validator::ValidationErrors;
 
 use crate::{
     dtos::category_dto::CategoryDTO,
-    middlewares::error_middleware::ErrorResponse,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::categories_service::update_category_service,
 };
 
@@ -14,11 +13,14 @@ use crate::{
     path = "/categories/{id}",
     tag = "Categories",
     request_body = CategoryDTO,
+    params(
+        ("id" = i32, description = "ID of the category")
+    ),
     responses(
         (status = 200, description = "Category updated", body = CategoryDTO),
-        (status = 400, description = "Validation Error", body = ErrorResponse),
-        (status = 404, description = "Category not found", body = ErrorResponse),
-        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 404, description = "Category not found", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
     )
 )]
 #[web::put("/categories/{id}")]
@@ -37,22 +39,6 @@ pub async fn update_category_controller(
         Ok(updated_category) => {
             Ok(HttpResponse::Ok().json(&CategoryDTO::from(updated_category)))
         }
-        Err(e) => {
-            if let Some(_) = e.downcast_ref::<ValidationErrors>() {
-                Ok(HttpResponse::BadRequest().json(&ErrorResponse::new(
-                    "validation_error",
-                    Some("Invalid data provided"),
-                    None,
-                )))
-            } else {
-                Ok(HttpResponse::InternalServerError().json(
-                    &ErrorResponse::new(
-                        "server_error",
-                        Some("An internal server error occurred"),
-                        None,
-                    ),
-                ))
-            }
-        }
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }

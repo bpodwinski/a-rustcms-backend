@@ -67,7 +67,7 @@ pub async fn select_tag_by_id(
     Ok(result)
 }
 
-pub async fn delete_tag_by_post_id(
+pub async fn delete_tag_by_id(
     pool: &PgPool,
     ids: Vec<i32>,
 ) -> Result<Vec<i32>, sqlx::Error> {

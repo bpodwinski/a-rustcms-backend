@@ -3,7 +3,7 @@ use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    middlewares::error_middleware::ErrorResponse,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::categories_service::get_category_by_id_service,
 };
 
@@ -16,8 +16,8 @@ use crate::{
     ),
     responses(
         (status = 200, description = "Category retrieved", body = CategoryDTO),
-        (status = 404, description = "Category not found", body = ErrorResponse),
-        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+        (status = 404, description = "Category not found", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
     )
 )]
 #[web::get("/categories/{id}")]
@@ -29,10 +29,6 @@ pub async fn get_category_by_id_controller(
         .await
     {
         Ok(category) => Ok(HttpResponse::Ok().json(&category)),
-        Err(_) => Ok(HttpResponse::NotFound().json(&ErrorResponse::new(
-            "not_found",
-            Some("Category not found"),
-            None,
-        ))),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }

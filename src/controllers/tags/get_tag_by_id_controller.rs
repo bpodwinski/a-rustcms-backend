@@ -1,29 +1,32 @@
-use ntex::web::{self, Error, HttpResponse};
+use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    handlers::error_handler::ErrorResponse,
-    services::tags::get_tags_by_id_service::get_tag_by_id_service,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::tags_service::get_tag_by_id_service,
 };
 
+#[utoipa::path(
+    get,
+    path = "/tags/{id}",
+    tag = "Tags",
+    params(
+        ("id" = i32, description = "ID of the tag")
+    ),
+    responses(
+        (status = 200, description = "Tag retrieved", body = TagDTO),
+        (status = 404, description = "Tag not found", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    )
+)]
 #[web::get("/tags/{id}")]
 pub async fn get_tag_by_id_controller(
     pool: web::types::State<PgPool>,
     tag_id: web::types::Path<i32>,
-) -> Result<HttpResponse, Error> {
+) -> Result<HttpResponse, web::Error> {
     match get_tag_by_id_service(pool.get_ref(), tag_id.into_inner()).await {
-        Ok(Some(tag)) => Ok(HttpResponse::Ok().json(&tag)),
-        Ok(None) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
-            error: format!("tag not found"),
-            details: None,
-        })),
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+        Ok(tag) => Ok(HttpResponse::Ok().json(&tag)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 

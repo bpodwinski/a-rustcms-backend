@@ -2,7 +2,7 @@ use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    middlewares::error_middleware::ErrorResponse,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::categories_service::get_all_categories_service,
 };
 
@@ -12,24 +12,16 @@ use crate::{
   tag = "Categories",
   responses(
     (status = 200, description = "Get all categories", body = CategoryDTO),
-    (status = 500, description = "Internal Server Error", body = ErrorResponse)
+    (status = 500, description = "Internal Server Error", body = Error)
   ),
 )]
 #[web::get("/categories")]
 pub async fn get_all_categories_controller(
     pool: web::types::State<PgPool>,
 ) -> Result<HttpResponse, web::Error> {
-    let result = get_all_categories_service(pool.get_ref()).await;
-
-    match result {
+    match get_all_categories_service(pool.get_ref()).await {
         Ok(categories) => Ok(HttpResponse::Ok().json(&categories)),
-        Err(e) => Ok(HttpResponse::InternalServerError().json(
-            &ErrorResponse::new(
-                "server_error",
-                Some("An internal server error occurred"),
-                None,
-            ),
-        )),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 

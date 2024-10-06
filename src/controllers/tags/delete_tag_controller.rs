@@ -1,31 +1,31 @@
-use ntex::web::{self, Error, HttpResponse};
+use ntex::web::{self, types::Json, Error, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    handlers::error_handler::ErrorResponse,
-    services::tags::delete_tag_by_id_service::delete_tag_by_id_service,
+    dtos::tag_dto::DeleteTagIdsDTO,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::tags_service::delete_tag_by_id_service,
 };
 
+#[utoipa::path(
+    delete,
+    path = "/tags",
+    tag = "Tags",
+    request_body = DeleteTagIdsDTO,
+    responses(
+        (status = 200, description = "Tags deleted", body = i32),
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    )
+)]
 #[web::delete("/tags/{id}")]
 pub async fn delete_tag_controller(
     pool: web::types::State<PgPool>,
-    tag_id: web::types::Path<i32>,
+    tag_id: Json<DeleteTagIdsDTO>,
 ) -> Result<HttpResponse, Error> {
     match delete_tag_by_id_service(pool.get_ref(), tag_id.into_inner()).await {
-        Ok(rows_affected) if rows_affected > 0 => {
-            Ok(HttpResponse::NoContent().finish())
-        }
-        Ok(err) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
-            error: format!("Not found: {}", err),
-            details: None,
-        })),
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+        Ok(deleted_ids) => Ok(HttpResponse::Ok().json(&deleted_ids)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 

@@ -1,18 +1,27 @@
 use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
-use crate::services::tags::get_all_tags_service::get_all_tags_service;
+use crate::{
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::tags_service::get_all_tags_service,
+};
 
+#[utoipa::path(
+  get,
+  path = "/tags",
+  tag = "Tags",
+  responses(
+    (status = 200, description = "Get all tags", body = CategoryDTO),
+    (status = 500, description = "Internal Server Error", body = Error)
+  ),
+)]
 #[web::get("/tags")]
 pub async fn get_all_tags_controller(
     pool: web::types::State<PgPool>,
-) -> HttpResponse {
+) -> Result<HttpResponse, web::Error> {
     match get_all_tags_service(pool.get_ref()).await {
-        Ok(tags) => HttpResponse::Ok().json(&tags),
-        Err(err) => {
-            eprintln!("Failed to fetch tags: {:?}", err);
-            HttpResponse::InternalServerError().finish()
-        }
+        Ok(tags) => Ok(HttpResponse::Ok().json(&tags)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 
