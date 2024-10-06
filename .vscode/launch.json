@@ -9,7 +9,18 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "preLaunchTask": "Build and Prepare Debug",
+      "preLaunchTask": "SQLx Prepare and Build Debug",
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "name": "Watch with LLDB",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/target/debug/${workspaceFolderBasename}.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "preLaunchTask": "SQLx Prepare and Watch",
       "sourceLanguages": ["rust"]
     }
   ]

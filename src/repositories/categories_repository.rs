@@ -2,8 +2,7 @@ use anyhow::Result;
 use sqlx::*;
 
 use crate::{
-    models::categories::categories_table_model::CategoryModel,
-    repositories::QueryBuilder,
+    models::categories_model::CategoryModel, repositories::QueryBuilder,
 };
 
 use super::Bind;
@@ -11,7 +10,7 @@ use super::Bind;
 pub async fn insert_category(
     pool: &PgPool,
     category_model: CategoryModel,
-) -> Result<CategoryModel, Error> {
+) -> Result<CategoryModel> {
     let result = QueryBuilder::<CategoryModel>::new(&pool)
         .table("categories")
         .fields(&["parent_id", "name", "slug", "description"])
@@ -31,7 +30,7 @@ pub async fn update_category(
     pool: &PgPool,
     id: i32,
     model: CategoryModel,
-) -> Result<CategoryModel, Error> {
+) -> Result<CategoryModel> {
     let result = QueryBuilder::<CategoryModel>::new(&pool)
         .table("categories")
         .fields(&["parent_id", "name", "slug", "description"])
@@ -47,9 +46,7 @@ pub async fn update_category(
     Ok(result)
 }
 
-pub async fn select_categories(
-    pool: &PgPool,
-) -> Result<Vec<CategoryModel>, Error> {
+pub async fn select_categories(pool: &PgPool) -> Result<Vec<CategoryModel>> {
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
         .fields(&[
@@ -61,15 +58,15 @@ pub async fn select_categories(
             "date_created",
         ])
         .select(None, None)
-        .await;
+        .await?;
 
-    result
+    Ok(result)
 }
 
 pub async fn select_category_by_id(
     pool: &PgPool,
     id: i32,
-) -> Result<CategoryModel, Error> {
+) -> Result<CategoryModel> {
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
         .fields(&[
@@ -88,11 +85,11 @@ pub async fn select_category_by_id(
 
 pub async fn delete_category_by_id(
     pool: &PgPool,
-    id: i32,
-) -> Result<u64, sqlx::Error> {
+    ids: Vec<i32>,
+) -> Result<Vec<i32>> {
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
-        .delete("id", Bind::Int(id))
+        .delete("id", ids)
         .await?;
 
     Ok(result)

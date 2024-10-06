@@ -1,10 +1,11 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 use validator::{Validate, ValidationErrors};
 
 use crate::models::tags::tags_table_model::TagModel;
 
-#[derive(sqlx::FromRow, Serialize, Deserialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct TagDTO {
     pub id: Option<i32>,
     pub name: String,
@@ -13,7 +14,7 @@ pub struct TagDTO {
     pub date_created: Option<NaiveDateTime>,
 }
 
-#[derive(sqlx::FromRow, Serialize, Deserialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct CreateTagDTO {
     pub name: String,
     pub slug: String,

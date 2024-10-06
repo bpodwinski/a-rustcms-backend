@@ -1,0 +1,42 @@
+use anyhow::Result;
+use ntex::web::{self, types::Json, HttpResponse};
+use sqlx::PgPool;
+
+use crate::{
+    dtos::category_dto::DeleteCategoryIdsDTO,
+    middlewares::error_middleware::ErrorResponse,
+    services::categories_service::delete_category_service,
+};
+
+#[utoipa::path(
+    delete,
+    path = "/categories",
+    tag = "Categories",
+    request_body = DeleteCategoryIdsDTO,
+    responses(
+        (status = 200, description = "Categories deleted", body = i32),
+        (status = 400, description = "Validation Error", body = ErrorResponse),
+        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+    )
+)]
+#[web::delete("/categories")]
+pub async fn delete_category_controller(
+    pool: web::types::State<PgPool>,
+    delete_category_ids_dto: Json<DeleteCategoryIdsDTO>,
+) -> Result<HttpResponse, web::Error> {
+    match delete_category_service(
+        pool.get_ref(),
+        delete_category_ids_dto.into_inner(),
+    )
+    .await
+    {
+        Ok(deleted_ids) => Ok(HttpResponse::Ok().json(&deleted_ids)),
+        Err(_) => Ok(HttpResponse::InternalServerError().json(
+            &ErrorResponse::new(
+                "server_error",
+                Some("Internal server error"),
+                None,
+            ),
+        )),
+    }
+}

@@ -322,32 +322,47 @@ where
         Ok(result)
     }
 
-    /// Builds and executes a DELETE query based on a condition.
+    /// Builds and executes a DELETE query that deletes multiple rows based on a list of IDs.
     ///
     /// # Arguments
-    /// * `condition_field` - The field to apply the condition to (e.g., `category_id`).
-    /// * `condition_value` - The value to bind to the condition.
+    /// * `column` - The column to apply the `WHERE` condition (e.g., "id").
+    /// * `ids` - A list of IDs to be deleted.
     ///
     /// # Returns
-    /// Returns a `Result` containing the number of rows affected, or an error.
+    /// Returns a `Result` containing the list of deleted IDs.
     async fn delete(
         self,
-        condition_field: &str,
-        condition_value: Bind,
-    ) -> Result<u64, Error> {
+        column: &str,
+        ids: Vec<i32>,
+    ) -> Result<Vec<i32>, Error> {
         let mut tx = self.pool.begin().await?;
 
         let query = format!(
-            "DELETE FROM {} WHERE {} = $1",
-            self.table, condition_field
+            "DELETE FROM {} WHERE {} = ANY($1::int[]) RETURNING {}",
+            self.table, column, column
         );
-        let mut sql_query = sqlx::query(&query);
 
-        sql_query = condition_value.bind_to_query(sql_query);
-        let result = sql_query.execute(&mut *tx).await?;
+        let mut sql_query = query_as::<_, (i32,)>(&query);
+
+        sql_query = Bind::Int(ids.len() as i32).bind_to_query(sql_query);
+
+        let rows = sql_query.bind(&ids).fetch_all(&mut *tx).await?;
 
         tx.commit().await?;
 
-        Ok(result.rows_affected())
+        let deleted_ids: Vec<i32> = rows.into_iter().map(|(id,)| id).collect();
+        Ok(deleted_ids)
+    }
+
+    /// Builds and executes a COUNT query to count the number of rows.
+    ///
+    /// # Returns
+    /// Returns a `Result` containing the count of rows.
+    async fn count(self) -> Result<i64, Error> {
+        let query = format!("SELECT COUNT(*) FROM {}", self.table);
+
+        let row: (i64,) = sqlx::query_as(&query).fetch_one(self.pool).await?;
+
+        Ok(row.0)
     }
 }

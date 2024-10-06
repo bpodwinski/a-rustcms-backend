@@ -49,26 +49,38 @@ pub async fn select_posts_categories(
     result
 }
 
-pub async fn select_post_category_by_id(
+pub async fn select_post_category_by_post_id(
     pool: &PgPool,
     id: i32,
 ) -> Result<PostsCategoriesModel, Error> {
     let result = QueryBuilder::<PostsCategoriesModel>::new(pool)
         .table("posts_categories")
         .fields(&["id", "post_id", "category_id", "date_created"])
-        .select_one(Some("id"), Some(&Bind::Int(id)))
+        .select_one(Some("post_id"), Some(&Bind::Int(id)))
         .await?;
 
     Ok(result)
 }
 
-pub async fn delete_post_category_by_id(
+pub async fn delete_post_category_by_post_id(
     pool: &PgPool,
-    id: i32,
-) -> Result<u64, sqlx::Error> {
+    post_ids: Vec<i32>,
+) -> Result<Vec<i32>, sqlx::Error> {
     let result = QueryBuilder::<PostsCategoriesModel>::new(pool)
-        .table("categories")
-        .delete("id", Bind::Int(id))
+        .table("posts_categories")
+        .delete("post_id", post_ids)
+        .await?;
+
+    Ok(result)
+}
+
+pub async fn delete_post_category_by_category_id(
+    pool: &PgPool,
+    category_ids: Vec<i32>,
+) -> Result<Vec<i32>, sqlx::Error> {
+    let result = QueryBuilder::<PostsCategoriesModel>::new(pool)
+        .table("posts_categories")
+        .delete("category_id", category_ids)
         .await?;
 
     Ok(result)

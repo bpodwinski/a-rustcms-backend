@@ -8,6 +8,14 @@ use crate::{
     services::tags::create_tag_service::create_tag_service,
 };
 
+#[utoipa::path(
+  post,
+  path = "/tags",
+  responses(
+    (status = 201, description = "Created", body = [CreateCategoryDTO]),
+    (status = 500, description = "Internal Server Error")
+  ),
+)]
 #[web::post("/tags")]
 pub async fn create_tag_controller(
     pool: web::types::State<PgPool>,

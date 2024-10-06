@@ -1,41 +1,36 @@
-use ntex::web::{
-    self, error::JsonPayloadError, types::Json, Error, HttpResponse,
-};
+use anyhow::Result as AnyhowResult;
+use ntex::web::{self, types::Json, HttpResponse};
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::CreateCategoryDTO;
-use crate::handlers::error_handler::ErrorResponse;
-use crate::services::categories::create_category_service::create_category_service;
+use crate::handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex;
+use crate::services::categories_service::create_category_service;
 
+#[utoipa::path(
+    post,
+    path = "/categories",
+    tag = "Categories",
+    request_body = CreateCategoryDTO,
+    responses(
+        (status = 201, description = "Create category", body = CategoryDTO),
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    ),
+)]
 #[web::post("/categories")]
 pub async fn create_category_controller(
     pool: web::types::State<PgPool>,
-    category_dto: Result<Json<CreateCategoryDTO>, JsonPayloadError>,
-) -> Result<HttpResponse, Error> {
-    match category_dto {
-        Ok(category_dto) => {
-            match create_category_service(
-                pool.get_ref(),
-                category_dto.into_inner(),
-            )
-            .await
-            {
-                Ok(created_category) => {
-                    Ok(HttpResponse::Created().json(&created_category))
-                }
-                Err(service_error) => {
-                    let error_response = service_error.to_error_response();
-                    Ok(HttpResponse::BadRequest().json(&error_response))
-                }
-            }
+    category_dto: Json<CreateCategoryDTO>,
+) -> Result<HttpResponse, web::Error> {
+    let result: AnyhowResult<_> =
+        create_category_service(pool.get_ref(), category_dto.into_inner())
+            .await;
+
+    match result {
+        Ok(created_category) => {
+            Ok(HttpResponse::Created().json(&created_category))
         }
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 

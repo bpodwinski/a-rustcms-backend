@@ -2,6 +2,14 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Watch",
+      "detail": "Run with Cargo Watch",
+      "type": "shell",
+      "command": "cargo watch -x run",
+      "group": "build",
+      "problemMatcher": ["$rustc"]
+    },
+    {
       "label": "Build Debug",
       "detail": "Builds the Rust debug binary",
       "type": "shell",
@@ -26,7 +34,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Build and Prepare Debug",
+      "label": "SQLx Prepare and Build Debug",
       "dependsOn": ["SQLx Prepare", "Build Debug"],
       "group": {
         "kind": "build",
@@ -34,8 +42,16 @@
       }
     },
     {
-      "label": "Build and Prepare Release",
+      "label": "SQLx Prepare and Build Release",
       "dependsOn": ["SQLx Prepare", "Build Release"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "SQLx Prepare and Watch",
+      "dependsOn": ["SQLx Prepare", "Watch"],
       "group": {
         "kind": "build",
         "isDefault": false

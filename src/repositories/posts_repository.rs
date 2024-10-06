@@ -99,13 +99,13 @@ pub async fn select_post_by_id(
     Ok(result)
 }
 
-pub async fn delete_post_by_id(
+pub async fn delete_post_by_post_id(
     pool: &PgPool,
-    id: i32,
-) -> Result<u64, sqlx::Error> {
+    ids: Vec<i32>,
+) -> Result<Vec<i32>, sqlx::Error> {
     let result = QueryBuilder::<PostModel>::new(pool)
         .table("posts")
-        .delete("id", Bind::Int(id))
+        .delete("id", ids)
         .await?;
 
     Ok(result)

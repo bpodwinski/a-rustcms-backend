@@ -20,3 +20,13 @@ pub fn get_database_url() -> String {
 pub fn get_cors_allowed_url() -> String {
     env::var("CORS_ALLOWED_URL").expect("CORS_ALLOWED_URL must be set")
 }
+
+pub fn get_backtrace() -> u16 {
+    let backtrace_str =
+        env::var("RUST_BACKTRACE").expect("RUST_BACKTRACE must be set");
+
+    match backtrace_str.parse::<u16>() {
+        Ok(backtrace) => backtrace,
+        Err(_) => panic!("RUST_BACKTRACE must be a valid u16"),
+    }
+}

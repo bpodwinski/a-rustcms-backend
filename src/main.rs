@@ -1,4 +1,6 @@
 use dotenv::dotenv;
+use env_logger::Env;
+use middlewares::error_middleware::Error;
 use ntex::web::{App, HttpServer};
 use ntex_cors::Cors;
 
@@ -7,6 +9,7 @@ mod controllers;
 mod db;
 mod dtos;
 mod handlers;
+mod middlewares;
 mod models;
 mod repositories;
 mod routes;
@@ -17,6 +20,8 @@ mod validators;
 #[ntex::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+
     let pool = db::init_pool(config::config::get_database_url())
         .await
         .expect("Failed to create pool");
@@ -26,6 +31,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Error {
+                message: String::from("Middleware error"),
+                backtrace: None,
+            })
             .wrap(
                 Cors::new()
                     .allowed_origin(&cors_allowed_url)
@@ -39,6 +48,7 @@ async fn main() -> std::io::Result<()> {
                     .finish(),
             )
             .state(pool.clone())
+            .configure(handlers::openapi::ntex_config)
             .configure(routes::init)
     })
     .workers(1)

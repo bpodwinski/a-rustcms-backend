@@ -1,18 +1,35 @@
 use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
-use crate::services::categories::get_all_categories_service::get_all_categories_service;
+use crate::{
+    middlewares::error_middleware::ErrorResponse,
+    services::categories_service::get_all_categories_service,
+};
 
+#[utoipa::path(
+  get,
+  path = "/categories",
+  tag = "Categories",
+  responses(
+    (status = 200, description = "Get all categories", body = CategoryDTO),
+    (status = 500, description = "Internal Server Error", body = ErrorResponse)
+  ),
+)]
 #[web::get("/categories")]
 pub async fn get_all_categories_controller(
     pool: web::types::State<PgPool>,
-) -> HttpResponse {
-    match get_all_categories_service(pool.get_ref()).await {
-        Ok(categories) => HttpResponse::Ok().json(&categories),
-        Err(err) => {
-            eprintln!("Failed to fetch categories: {:?}", err);
-            HttpResponse::InternalServerError().finish()
-        }
+) -> Result<HttpResponse, web::Error> {
+    let result = get_all_categories_service(pool.get_ref()).await;
+
+    match result {
+        Ok(categories) => Ok(HttpResponse::Ok().json(&categories)),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(
+            &ErrorResponse::new(
+                "server_error",
+                Some("An internal server error occurred"),
+                None,
+            ),
+        )),
     }
 }
 

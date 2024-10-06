@@ -7,6 +7,16 @@ use crate::{
     services::posts::create_post_service::create_post_service,
 };
 
+#[utoipa::path(
+    post,
+    path = "/posts",
+    request_body = CreatePostDTO,
+    responses(
+        (status = 201, description = "Post created successfully", body = PostWithCategories),
+        (status = 400, description = "Validation error"),
+        (status = 500, description = "Internal server error")
+    )
+)]
 #[web::post("/posts")]
 pub async fn create_post_controller(
     pool: web::types::State<PgPool>,

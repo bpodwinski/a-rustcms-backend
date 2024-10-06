@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use crate::models::posts::posts_table_model::PostModel;
 use crate::models::posts::posts_type_model::PostsStatus;
@@ -9,18 +10,18 @@ pub struct PostId {
     pub id: i32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct CreatePostDTO {
     pub post: PostModel,
     pub categories_ids: Vec<i32>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct DeletePostsIdsDTO {
     pub ids: Vec<i32>,
 }
 
-#[derive(sqlx::FromRow, Serialize, Deserialize)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct PostDTO {
     pub id: Option<i32>,
     pub title: String,
