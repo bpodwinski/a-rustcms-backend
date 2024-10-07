@@ -1,11 +1,9 @@
 use anyhow::Result;
-use sqlx::*;
+use sqlx::PgPool;
 
-use crate::{
-    models::categories_model::CategoryModel, repositories::QueryBuilder,
-};
+use crate::models::categories_model::CategoryModel;
 
-use super::Bind;
+use super::{Bind, QueryBuilder};
 
 pub async fn insert_category(
     pool: &PgPool,

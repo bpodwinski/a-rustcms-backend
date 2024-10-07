@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::{Validate, ValidationErrors};
 
-use crate::models::tags::tags_table_model::TagModel;
+use crate::models::tags_model::TagModel;
 
 /// Batch deletion of tags
 #[derive(Serialize, Deserialize, ToSchema)]

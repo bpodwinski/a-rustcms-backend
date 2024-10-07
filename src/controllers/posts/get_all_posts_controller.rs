@@ -1,34 +1,37 @@
-use ntex::web::{self, types::Query, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Query, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
-use validator::Validate;
 
 use crate::{
     dtos::{
         pagination_dto::PaginationParamsDTO,
         post_dto::{SortColumn, SortOrder},
     },
-    handlers::error_handler::ErrorResponse,
-    services::posts::get_all_posts_service::get_all_posts_service,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::posts_services::get_all_posts_service,
 };
 
+#[utoipa::path(
+    get,
+    path = "/posts",
+    tag = "Posts",
+    params(
+        PaginationParamsDTO
+    ),
+    responses(
+        (status = 200, description = "List of posts retrieved successfully", body = PostDTO),
+        (status = 400, description = "Bad Request"),
+        (status = 500, description = "Internal Server Error")
+    )
+)]
 #[web::get("/posts")]
 pub async fn get_all_posts_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
     params: Query<PaginationParamsDTO>,
-) -> HttpResponse {
-    // Validation des paramètres après parsing
-    if let Err(validation_errors) = params.validate() {
-        let error_message =
-            format!("Validation error: {:?}", validation_errors);
-
-        let error_response = ErrorResponse {
-            error: error_message,
-            details: None,
-        };
-
-        return HttpResponse::BadRequest().json(&error_response);
-    }
-
+) -> Result<HttpResponse, web::Error> {
     let page = params.page.unwrap_or(1);
     let limit = params.limit.unwrap_or(20);
 
@@ -54,11 +57,8 @@ pub async fn get_all_posts_controller(
     )
     .await
     {
-        Ok(posts) => HttpResponse::Ok().json(&posts),
-        Err(err) => {
-            eprintln!("Failed to fetch posts: {:?}", err);
-            HttpResponse::InternalServerError().finish()
-        }
+        Ok(posts) => Ok(HttpResponse::Ok().json(&posts)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 
@@ -66,7 +66,7 @@ pub async fn get_all_posts_controller(
 mod tests {
     use crate::controllers::posts::get_all_posts_controller::get_all_posts_controller;
     use crate::dtos::post_dto::PostDTO;
-    use crate::models::posts::posts_type_model::PostsStatus;
+    use crate::models::posts_model::PostsStatus;
     use crate::tests::helpers::setup::setup_test_db;
     use chrono::NaiveDateTime;
     use ntex::http;

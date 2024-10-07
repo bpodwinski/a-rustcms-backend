@@ -1,5 +1,9 @@
 use anyhow::Result;
-use ntex::web::{self, types::Json, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Json, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
@@ -21,7 +25,7 @@ use crate::{
 )]
 #[web::delete("/categories")]
 pub async fn delete_category_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
     delete_category_ids_dto: Json<DeleteCategoryIdsDTO>,
 ) -> Result<HttpResponse, web::Error> {
     match delete_category_service(

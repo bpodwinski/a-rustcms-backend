@@ -1,5 +1,9 @@
 use anyhow::Result;
-use ntex::web::{self, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Path, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
@@ -22,8 +26,8 @@ use crate::{
 )]
 #[web::get("/categories/{id}")]
 pub async fn get_category_by_id_controller(
-    pool: web::types::State<PgPool>,
-    category_id: web::types::Path<i32>,
+    pool: State<PgPool>,
+    category_id: Path<i32>,
 ) -> Result<HttpResponse, web::Error> {
     match get_category_by_id_service(pool.get_ref(), category_id.into_inner())
         .await

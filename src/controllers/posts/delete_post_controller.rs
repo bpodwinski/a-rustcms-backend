@@ -1,33 +1,37 @@
-use ntex::web::{self, Error, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Json, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
-    dtos::post_dto::DeletePostsIdsDTO, handlers::error_handler::ErrorResponse,
-    services::posts::delete_posts_service::delete_posts_service,
+    dtos::post_dto::DeletePostIdsDTO,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::posts_services::delete_post_service,
 };
 
+#[utoipa::path(
+    delete,
+    path = "/posts",
+    tag = "Posts",
+    request_body = DeletePostIdsDTO,
+    responses(
+        (status = 200, description = "Posts deleted", body = i32),
+        (status = 400, description = "Validation Error", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    )
+)]
 #[web::delete("/posts")]
 pub async fn delete_post_controller(
-    pool: web::types::State<PgPool>,
-    posts_request: web::types::Json<DeletePostsIdsDTO>,
-) -> Result<HttpResponse, Error> {
-    let posts_ids = posts_request.into_inner();
-
-    match delete_posts_service(pool.get_ref(), posts_ids).await {
-        Ok(deleted_ids) if !deleted_ids.ids.is_empty() => {
-            Ok(HttpResponse::Ok().json(&deleted_ids))
-        }
-        Ok(_) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
-            error: "No posts found to delete".to_string(),
-            details: None,
-        })),
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+    pool: State<PgPool>,
+    delete_post_ids_dto: Json<DeletePostIdsDTO>,
+) -> Result<HttpResponse, web::Error> {
+    match delete_post_service(pool.get_ref(), delete_post_ids_dto.into_inner())
+        .await
+    {
+        Ok(deleted_ids) => Ok(HttpResponse::Ok().json(&deleted_ids)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 
@@ -39,7 +43,7 @@ mod tests {
     use serde_json::from_slice;
 
     use super::*;
-    use crate::models::posts::posts_type_model::PostsStatus;
+    use crate::models::posts_model::PostsStatus;
     use crate::tests::helpers::setup::setup_test_db;
 
     #[ntex::test]
@@ -108,7 +112,7 @@ mod tests {
         // Act
         let req = test::TestRequest::delete()
             .uri(&format!("/posts"))
-            .set_json(&DeletePostsIdsDTO {
+            .set_json(&DeletePostIdsDTO {
                 ids: vec![inserted_post.id],
             })
             .to_request();
@@ -119,7 +123,7 @@ mod tests {
 
         // Check that the response contains the deleted post ID
         let body = test::read_body(resp).await;
-        let deleted_ids: DeletePostsIdsDTO =
+        let deleted_ids: DeletePostIdsDTO =
             from_slice(&body).expect("Failed to parse response body");
         assert_eq!(deleted_ids.ids, vec![inserted_post.id]);
     }

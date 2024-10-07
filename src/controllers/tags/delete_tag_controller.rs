@@ -1,4 +1,8 @@
-use ntex::web::{self, types::Json, Error, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Json, State},
+    Error, HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
@@ -20,7 +24,7 @@ use crate::{
 )]
 #[web::delete("/tags/{id}")]
 pub async fn delete_tag_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
     tag_id: Json<DeleteTagIdsDTO>,
 ) -> Result<HttpResponse, Error> {
     match delete_tag_by_id_service(pool.get_ref(), tag_id.into_inner()).await {

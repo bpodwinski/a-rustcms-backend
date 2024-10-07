@@ -1,9 +1,13 @@
 use anyhow::Result;
-use ntex::web::{self, types::Json, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Json, Path, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
-    dtos::category_dto::CategoryDTO,
+    dtos::category_dto::{CategoryDTO, CreateCategoryDTO},
     handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::categories_service::update_category_service,
 };
@@ -25,9 +29,9 @@ use crate::{
 )]
 #[web::put("/categories/{id}")]
 pub async fn update_category_controller(
-    pool: web::types::State<PgPool>,
-    category_id: web::types::Path<i32>,
-    category_dto: Json<CategoryDTO>,
+    pool: State<PgPool>,
+    category_id: Path<i32>,
+    category_dto: Json<CreateCategoryDTO>,
 ) -> Result<HttpResponse, web::Error> {
     match update_category_service(
         pool.get_ref(),

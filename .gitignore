@@ -4,3 +4,5 @@
 .lock
 /.idea/
 Cargo.lock
+
+.fake

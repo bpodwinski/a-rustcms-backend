@@ -6,9 +6,12 @@ use utoipa::OpenApi;
 use crate::{
     dtos::{
         category_dto::{CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO},
+        pagination_dto::PaginationParamsDTO,
+        post_dto::{CreatePostDTO, DeletePostIdsDTO, PostDTO},
         tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO},
     },
     middlewares::error_middleware::Error,
+    models::posts_model::PostsStatus,
 };
 
 /// Main structure to generate OpenAPI documentation
@@ -24,8 +27,12 @@ use crate::{
         crate::controllers::tags::delete_tag_controller::delete_tag_controller,
         crate::controllers::tags::get_tag_by_id_controller::get_tag_by_id_controller,
         crate::controllers::tags::get_all_tags_controller::get_all_tags_controller,
+        crate::controllers::posts::create_post_controller::create_post_controller,
+        crate::controllers::posts::get_all_posts_controller::get_all_posts_controller,
+        crate::controllers::posts::create_post_controller::create_post_controller,
     ),
-    components(schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO, TagDTO, CreateTagDTO, DeleteTagIdsDTO)),
+    components(schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO,
+        TagDTO, PostDTO, CreateTagDTO, DeleteTagIdsDTO, CreatePostDTO, DeletePostIdsDTO, PaginationParamsDTO, PostsStatus)),
     servers(
         (url = "/api/v1", description = "API v1")
     )

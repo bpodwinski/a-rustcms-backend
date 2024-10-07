@@ -1,4 +1,5 @@
-use ntex::web::{self, types::Json, HttpResponse};
+use ntex::web::types::{Json, State};
+use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::CreateCategoryDTO;
@@ -11,14 +12,14 @@ use crate::services::categories_service::create_category_service;
     tag = "Categories",
     request_body = CreateCategoryDTO,
     responses(
-        (status = 201, description = "Create category", body = CategoryDTO),
+        (status = 201, description = "Category created successfully", body = CategoryDTO),
         (status = 400, description = "Validation Error", body = Error),
         (status = 500, description = "Internal Server Error", body = Error)
     ),
 )]
 #[web::post("/categories")]
 pub async fn create_category_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
     category_dto: Json<CreateCategoryDTO>,
 ) -> Result<HttpResponse, web::Error> {
     match create_category_service(pool.get_ref(), category_dto.into_inner())

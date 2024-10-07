@@ -1,4 +1,8 @@
-use ntex::web::{self, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Path, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
@@ -21,8 +25,8 @@ use crate::{
 )]
 #[web::get("/tags/{id}")]
 pub async fn get_tag_by_id_controller(
-    pool: web::types::State<PgPool>,
-    tag_id: web::types::Path<i32>,
+    pool: State<PgPool>,
+    tag_id: Path<i32>,
 ) -> Result<HttpResponse, web::Error> {
     match get_tag_by_id_service(pool.get_ref(), tag_id.into_inner()).await {
         Ok(tag) => Ok(HttpResponse::Ok().json(&tag)),

@@ -1,4 +1,8 @@
-use ntex::web::{self, types::Json, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Json, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
@@ -20,7 +24,7 @@ use crate::{
 )]
 #[web::post("/tags")]
 pub async fn create_tag_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
     tag_dto: Json<CreateTagDTO>,
 ) -> Result<HttpResponse, web::Error> {
     match create_tag_service(pool.get_ref(), tag_dto.into_inner()).await {

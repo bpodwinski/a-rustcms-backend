@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::{
@@ -23,14 +23,12 @@ pub async fn create_category_service(
 pub async fn get_all_categories_service(
     pool: &PgPool,
 ) -> Result<Vec<CategoryDTO>> {
-    let category_models: Vec<CategoryModel> = select_categories(pool)
-        .await
-        .context("Failed to fetch categories from the database")?;
+    let category_model: Vec<CategoryModel> = select_categories(pool).await?;
 
-    let category_dtos: Vec<CategoryDTO> =
-        category_models.into_iter().map(CategoryDTO::from).collect();
+    let category_dto: Vec<CategoryDTO> =
+        category_model.into_iter().map(CategoryDTO::from).collect();
 
-    Ok(category_dtos)
+    Ok(category_dto)
 }
 
 pub async fn get_category_by_id_service(
@@ -47,7 +45,7 @@ pub async fn get_category_by_id_service(
 pub async fn update_category_service(
     pool: &PgPool,
     id: i32,
-    update_category_dto: CategoryDTO,
+    update_category_dto: CreateCategoryDTO,
 ) -> Result<CategoryModel> {
     let mut category_model: CategoryModel = update_category_dto.try_into()?;
     category_model.id = Some(id);

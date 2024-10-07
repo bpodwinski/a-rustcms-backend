@@ -2,7 +2,7 @@ use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::dtos::tag_dto::{CreateTagDTO, DeleteTagIdsDTO};
-use crate::models::tags::tags_table_model::TagModel;
+use crate::models::tags_model::TagModel;
 use crate::repositories::tags_repository::{
     delete_tag_by_id, insert_tag, select_tag_by_id, select_tags, update_tag,
 };

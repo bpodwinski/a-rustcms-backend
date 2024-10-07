@@ -1,4 +1,4 @@
-use ntex::web::{self, HttpResponse};
+use ntex::web::{self, types::State, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
@@ -17,7 +17,7 @@ use crate::{
 )]
 #[web::get("/categories")]
 pub async fn get_all_categories_controller(
-    pool: web::types::State<PgPool>,
+    pool: State<PgPool>,
 ) -> Result<HttpResponse, web::Error> {
     match get_all_categories_service(pool.get_ref()).await {
         Ok(categories) => Ok(HttpResponse::Ok().json(&categories)),

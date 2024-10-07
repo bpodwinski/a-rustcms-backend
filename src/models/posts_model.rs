@@ -1,13 +1,13 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Type};
+use utoipa::ToSchema;
 use validator::{Validate, ValidationError};
 
 use crate::validators::slug_validator::validate_slug;
 
-use super::posts_type_model::PostsStatus;
-
 /// Represents a blog post with associated metadata and categories.
-#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Validate, Serialize, Deserialize, FromRow)]
 pub struct PostModel {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
@@ -52,6 +52,16 @@ pub struct PostModel {
 
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     pub categories: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type, Clone, PartialEq, ToSchema)]
+#[sqlx(type_name = "posts_status")]
+pub enum PostsStatus {
+    Draft,
+    Pending,
+    Private,
+    Scheduled,
+    Published,
 }
 
 fn validate_post_status(status: &PostsStatus) -> Result<(), ValidationError> {

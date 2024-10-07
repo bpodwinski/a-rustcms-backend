@@ -1,16 +1,14 @@
 use anyhow::Result;
-use sqlx::*;
+use sqlx::PgPool;
 
-use crate::{
-    models::tags::tags_table_model::TagModel, repositories::QueryBuilder,
-};
+use crate::models::tags_model::TagModel;
 
-use super::Bind;
+use super::{Bind, QueryBuilder};
 
 pub async fn insert_tag(
     pool: &PgPool,
     tag_model: TagModel,
-) -> Result<TagModel, Error> {
+) -> Result<TagModel> {
     let result = QueryBuilder::<TagModel>::new(&pool)
         .table("tags")
         .fields(&["name", "slug", "description"])
@@ -29,7 +27,7 @@ pub async fn update_tag(
     pool: &PgPool,
     id: i32,
     model: TagModel,
-) -> Result<TagModel, Error> {
+) -> Result<TagModel> {
     let result = QueryBuilder::<TagModel>::new(&pool)
         .table("tags")
         .fields(&["name", "slug", "description"])
@@ -44,20 +42,17 @@ pub async fn update_tag(
     Ok(result)
 }
 
-pub async fn select_tags(pool: &PgPool) -> Result<Vec<TagModel>, Error> {
+pub async fn select_tags(pool: &PgPool) -> Result<Vec<TagModel>> {
     let result = QueryBuilder::<TagModel>::new(pool)
         .table("tags")
         .fields(&["id", "name", "slug", "description", "date_created"])
         .select(None, None)
-        .await;
+        .await?;
 
-    result
+    Ok(result)
 }
 
-pub async fn select_tag_by_id(
-    pool: &PgPool,
-    id: i32,
-) -> Result<TagModel, Error> {
+pub async fn select_tag_by_id(pool: &PgPool, id: i32) -> Result<TagModel> {
     let result = QueryBuilder::<TagModel>::new(pool)
         .table("tags")
         .fields(&["id", "name", "slug", "description", "date_created"])
@@ -70,7 +65,7 @@ pub async fn select_tag_by_id(
 pub async fn delete_tag_by_id(
     pool: &PgPool,
     ids: Vec<i32>,
-) -> Result<Vec<i32>, sqlx::Error> {
+) -> Result<Vec<i32>> {
     let result = QueryBuilder::<TagModel>::new(pool)
         .table("tags")
         .delete("id", ids)

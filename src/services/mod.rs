@@ -4,6 +4,7 @@ use sqlx::PgPool;
 use std::marker::PhantomData;
 
 pub mod categories_service;
+pub mod posts_services;
 pub mod tags_service;
 
 /// A flexible service builder that handles both single model and Vec<Model> operations.
