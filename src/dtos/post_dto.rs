@@ -86,6 +86,28 @@ impl From<PostModel> for PostDTO {
     }
 }
 
+/// Converts `PostDTO` to `PostModel`
+impl TryFrom<PostDTO> for PostModel {
+    type Error = ValidationErrors;
+
+    fn try_from(dto: PostDTO) -> Result<Self, Self::Error> {
+        let tag = PostModel {
+            id: dto.id,
+            title: dto.title,
+            content: dto.content,
+            slug: dto.slug,
+            author_id: dto.author_id,
+            status: dto.status,
+            date_published: dto.date_published,
+            date_created: dto.date_created,
+            categories: dto.categories,
+        };
+
+        tag.validate()?;
+        Ok(tag)
+    }
+}
+
 pub enum SortColumn {
     Id,
     Title,

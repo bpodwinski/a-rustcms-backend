@@ -11,7 +11,10 @@ use crate::{
         },
         posts::{
             create_post_controller::create_post_controller,
+            delete_post_controller::delete_post_controller,
             get_all_posts_controller::get_all_posts_controller,
+            get_post_by_id_controller::get_post_by_id_controller,
+            update_post_controller::update_post_controller,
         },
         tags::{
             create_tag_controller::create_tag_controller,
@@ -26,7 +29,7 @@ use crate::{
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/api/v1")
-            .wrap(JwtMiddleware)
+            //.wrap(JwtMiddleware)
             .service(create_tag_controller)
             .service(get_all_tags_controller)
             .service(get_tag_by_id_controller)
@@ -37,8 +40,9 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .service(delete_category_controller)
             .service(update_category_controller)
             .service(create_post_controller)
-            .service(get_all_posts_controller),
-        //.service(get_post_by_id_controller)
-        //.service(delete_post_controller),
+            .service(get_all_posts_controller)
+            .service(get_post_by_id_controller)
+            .service(update_post_controller)
+            .service(delete_post_controller),
     );
 }

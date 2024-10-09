@@ -2,28 +2,31 @@ use ntex::web::{self, Error, HttpResponse};
 use sqlx::PgPool;
 
 use crate::{
-    handlers::error_handler::ErrorResponse,
-    services::posts::get_post_by_id_service::get_post_by_id_service,
+    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    services::posts_services::get_post_by_id_service,
 };
 
+#[utoipa::path(
+    get,
+    path = "/posts/{id}",
+    tag = "Posts",
+    params(
+        ("id" = i32, description = "ID of the post")
+    ),
+    responses(
+        (status = 200, description = "Post retrieved", body = PostDTO),
+        (status = 404, description = "Post not found", body = Error),
+        (status = 500, description = "Internal Server Error", body = Error)
+    )
+)]
 #[web::get("/posts/{id}")]
 pub async fn get_post_by_id_controller(
     pool: web::types::State<PgPool>,
     post_id: web::types::Path<i32>,
 ) -> Result<HttpResponse, Error> {
     match get_post_by_id_service(pool.get_ref(), post_id.into_inner()).await {
-        Ok(Some(post)) => Ok(HttpResponse::Ok().json(&post)),
-        Ok(None) => Ok(HttpResponse::NotFound().json(&ErrorResponse {
-            error: format!("Post not found"),
-            details: None,
-        })),
-        Err(err) => {
-            let error_response = ErrorResponse {
-                error: format!("JSON parse error: {}", err),
-                details: None,
-            };
-            Ok(HttpResponse::BadRequest().json(&error_response))
-        }
+        Ok(post) => Ok(HttpResponse::Ok().json(&post)),
+        Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
 }
 
@@ -31,7 +34,7 @@ pub async fn get_post_by_id_controller(
 mod tests {
     use crate::controllers::posts::get_post_by_id_controller::get_post_by_id_controller;
     use crate::dtos::post_dto::PostDTO;
-    use crate::models::posts::posts_type_model::PostsStatus;
+    use crate::models::posts_model::PostsStatus;
     use crate::tests::helpers::setup::setup_test_db;
     use chrono::NaiveDateTime;
     use ntex::http;
