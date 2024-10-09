@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sqlx::PgPool;
 
-use crate::dtos::tag_dto::{CreateTagDTO, DeleteTagIdsDTO};
+use crate::dtos::tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO};
 use crate::models::tags_model::TagModel;
 use crate::repositories::tags_repository::{
     delete_tag_by_id, insert_tag, select_tag_by_id, select_tags, update_tag,
@@ -29,9 +29,12 @@ pub async fn update_tag_service(
 }
 
 /// Service pour récupérer tous les tags dans la base de données.
-pub async fn get_all_tags_service(pool: &PgPool) -> Result<Vec<TagModel>> {
-    let tags = select_tags(pool).await?;
-    Ok(tags)
+pub async fn get_all_tags_service(pool: &PgPool) -> Result<Vec<TagDTO>> {
+    let tags_model = select_tags(pool).await?;
+
+    let tags_dto: Vec<TagDTO> =
+        tags_model.into_iter().map(TagDTO::from).collect();
+    Ok(tags_dto)
 }
 
 /// Service pour récupérer un tag par son ID dans la base de données.

@@ -54,9 +54,9 @@ mod tests {
         .await;
 
         let tag = CreateTagDTO {
-            name: String::from("New tag"),
-            slug: String::from("new-tag"),
-            description: Some(String::from("New tag description")),
+            name: String::from("Test Create Tag Success"),
+            slug: String::from("test-create-tag-success"),
+            description: None,
         };
 
         // Act
@@ -93,9 +93,9 @@ mod tests {
         .await;
 
         let tag = CreateTagDTO {
-            name: String::new(), // Empty name, should trigger validation failure
-            slug: String::from("test-tag"),
-            description: Some(String::from("Test tag description")),
+            name: String::from("Test Validation Failure"),
+            slug: String::from("test-validation-failure-*/!"),
+            description: None,
         };
 
         // Act
@@ -121,9 +121,9 @@ mod tests {
         .await;
 
         let tag = CreateTagDTO {
-            name: String::from("Test tag"),
-            slug: String::from("test-tag"),
-            description: Some(String::from("Test tag description")),
+            name: String::from("Test Tag Internal Error"),
+            slug: String::from("test-tag-internal-error"),
+            description: None,
         };
 
         // Act
