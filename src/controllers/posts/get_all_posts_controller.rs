@@ -112,16 +112,10 @@ mod tests {
             .id
         };
 
-        let custom_date = NaiveDateTime::parse_from_str(
-            "2024-01-01 12:00:00",
-            "%Y-%m-%d %H:%M:%S",
-        )
-        .expect("Failed to parse date");
-
         let inserted_post = sqlx::query!(
             r#"
-            INSERT INTO posts (title, content, slug, author_id, status, date_published) 
-            VALUES ($1, $2, $3, $4, $5::posts_status, $6)
+            INSERT INTO posts (title, content, slug, author_id, status) 
+            VALUES ($1, $2, $3, $4, $5::posts_status)
             RETURNING id
             "#,
             "Test Post",
@@ -129,7 +123,6 @@ mod tests {
             "test-post",
             user_id,
             PostsStatus::Published as _,
-            custom_date
         )
         .fetch_one(&pool)
         .await
