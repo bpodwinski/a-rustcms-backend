@@ -17,6 +17,12 @@ use crate::{
 /// Main structure to generate OpenAPI documentation
 #[derive(OpenApi)]
 #[openapi(
+    components(schemas(
+        Claims
+    )),
+    security(
+        ("bearer_auth" = [])
+    ),
     paths(
         crate::controllers::categories::create_category_controller::create_category_controller,
         crate::controllers::categories::get_all_categories_controller::get_all_categories_controller,
