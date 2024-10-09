@@ -1,7 +1,8 @@
-use database::HasArguments;
-use postgres::PgRow;
-use query::{Query, QueryAs};
-use sqlx::*;
+use sqlx::{
+    postgres::PgRow,
+    query::{Query, QueryAs},
+    query_as, Database, Encode, Error, FromRow, PgPool, Type,
+};
 
 pub mod categories_repository;
 pub mod posts_categories_repository;
@@ -43,7 +44,7 @@ pub trait BindableQuery<'q, DB: Database>: Sized {
 
 /// Implement `BindableQuery` for `Query`.
 impl<'q, DB> BindableQuery<'q, DB>
-    for Query<'q, DB, <DB as HasArguments<'q>>::Arguments>
+    for Query<'q, DB, <DB as Database>::Arguments<'q>>
 where
     DB: Database,
 {
@@ -57,7 +58,7 @@ where
 
 /// Implement `BindableQuery` for `QueryAs`.
 impl<'q, DB, O> BindableQuery<'q, DB>
-    for QueryAs<'q, DB, O, <DB as HasArguments<'q>>::Arguments>
+    for QueryAs<'q, DB, O, <DB as Database>::Arguments<'q>>
 where
     DB: Database,
 {
