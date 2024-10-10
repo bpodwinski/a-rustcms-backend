@@ -107,15 +107,3 @@ impl TryFrom<PostDTO> for PostModel {
         Ok(tag)
     }
 }
-
-pub enum SortColumn {
-    Id,
-    Title,
-    AuthorId,
-    DatePublished,
-}
-
-pub enum SortOrder {
-    Asc,
-    Desc,
-}

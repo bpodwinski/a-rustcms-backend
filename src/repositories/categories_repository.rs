@@ -74,9 +74,19 @@ pub async fn update_category(
 /// # Returns
 ///
 /// * `Result<Vec<CategoryModel>>` - A vector containing the retrieved `CategoryModel` records.
-pub async fn select_categories(pool: &PgPool) -> Result<Vec<CategoryModel>> {
+pub async fn select_categories(
+    pool: &PgPool,
+    limit: i64,
+    offset: i64,
+    sort_column: &str,
+    sort_order: &str,
+) -> Result<Vec<CategoryModel>> {
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
+        .limit(limit)
+        .offset(offset)
+        .sort_column(sort_column)
+        .sort_order(sort_order)
         .fields(&[
             "id",
             "parent_id",
@@ -138,6 +148,15 @@ pub async fn delete_category_by_id(
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
         .delete("id", ids)
+        .await?;
+
+    Ok(result)
+}
+
+pub async fn count_categories(pool: &PgPool) -> Result<i64> {
+    let result = QueryBuilder::<CategoryModel>::new(pool)
+        .table("categories")
+        .count()
         .await?;
 
     Ok(result)

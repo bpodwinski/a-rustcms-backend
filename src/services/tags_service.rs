@@ -9,6 +9,8 @@ use crate::repositories::tags_repository::{
     update_tag,
 };
 
+use super::calculate_pagination;
+
 /// Service to insert a new tag into the database.
 ///
 /// # Arguments
@@ -71,25 +73,19 @@ pub async fn get_all_tags_service(
     sort_order: &str,
 ) -> Result<PaginationDTO<TagDTO>> {
     let total_items = count_tags(pool).await?;
-    let total_pages = (total_items as f64 / limit as f64).ceil() as i64;
-
-    let offset = (page - 1) * limit;
-    let current_page = if page > total_pages {
-        total_pages
-    } else {
-        page
-    };
+    let pagination = calculate_pagination(total_items, page, limit);
 
     let tags_model =
-        select_tags(pool, limit, offset, sort_column, sort_order).await?;
+        select_tags(pool, limit, pagination.offset, sort_column, sort_order)
+            .await?;
 
     let tags_dto: Vec<TagDTO> =
         tags_model.into_iter().map(TagDTO::from).collect();
 
     Ok(PaginationDTO {
-        current_page,
-        total_pages,
-        total_items,
+        current_page: pagination.current_page,
+        total_pages: pagination.total_pages,
+        total_items: pagination.total_items,
         data: tags_dto,
     })
 }
