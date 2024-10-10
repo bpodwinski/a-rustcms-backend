@@ -10,7 +10,7 @@ pub mod posts_repository;
 pub mod tags_repository;
 
 /// Enum to represent different types of bindable values for SQL queries
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Bind {
     Int(i32),
     Text(String),
@@ -82,7 +82,7 @@ struct QueryBuilder<'a, T> {
     _marker: std::marker::PhantomData<T>,
 }
 
-/// Enum to differentiate between query types: Select and Insert
+/// Enum to differentiate between query types
 #[derive(PartialEq)]
 enum QueryType {
     Select,
@@ -148,7 +148,6 @@ where
     /// Returns the `QueryBuilder` with the values set.
     fn values(mut self, values: Vec<Bind>) -> Self {
         self.values = values;
-        self.query_type = QueryType::Insert;
         self
     }
 
@@ -250,7 +249,8 @@ where
     ///
     /// # Returns
     /// Returns a `Result` containing the inserted row, or an error.
-    async fn insert(self) -> Result<T, Error> {
+    async fn insert(mut self) -> Result<T, Error> {
+        self.query_type = QueryType::Insert;
         let mut tx = self.pool.begin().await?;
 
         let fields_str = self.fields.join(", ");
@@ -280,16 +280,13 @@ where
     /// Builds and executes an UPDATE query based on a condition.
     ///
     /// # Arguments
-    /// * `condition_field` - The field to apply the condition to (e.g., `category_id`).
-    /// * `condition_value` - The value to bind to the condition.
+    /// * `field` - The field to apply the condition to (e.g., `id`).
+    /// * `value` - The value to bind to the condition.
     ///
     /// # Returns
     /// Returns a `Result` containing the number of rows affected, or an error.
-    async fn update(
-        self,
-        condition_field: &str,
-        condition_value: Bind,
-    ) -> Result<T, Error> {
+    async fn update(mut self, field: &str, value: Bind) -> Result<T, Error> {
+        self.query_type = QueryType::Update;
         let mut tx = self.pool.begin().await?;
 
         let update_fields_str = self
@@ -300,21 +297,26 @@ where
             .collect::<Vec<String>>()
             .join(", ");
 
-        let query = format!(
-            "UPDATE {} SET {} WHERE {} = ${}",
-            self.table,
-            update_fields_str,
-            condition_field,
-            self.fields.len() + 1
-        );
-
-        let mut sql_query = query_as(&query);
+        let query = match value {
+            Bind::Int(val) => format!(
+                "UPDATE {} SET {} WHERE {} = {} RETURNING *;",
+                self.table, update_fields_str, field, val
+            ),
+            Bind::Text(ref val) => format!(
+                "UPDATE {} SET {} WHERE {} = '{}' RETURNING *;",
+                self.table, update_fields_str, field, val
+            ),
+            Bind::Null => {
+                return Err(Error::RowNotFound);
+            }
+        };
+        let mut sql_query = query_as::<_, T>(&query);
 
         for value in &self.values {
             sql_query = value.clone().bind_to_query(sql_query);
         }
 
-        sql_query = condition_value.bind_to_query(sql_query);
+        sql_query = value.bind_to_query(sql_query);
 
         let result = sql_query.fetch_one(&mut *tx).await?;
 

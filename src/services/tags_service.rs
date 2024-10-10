@@ -22,10 +22,13 @@ pub async fn create_tag_service(
 pub async fn update_tag_service(
     pool: &PgPool,
     id: i32,
-    tag_model: TagModel,
+    update_tag_dto: CreateTagDTO,
 ) -> Result<TagModel> {
-    let updated_tag = update_tag(pool, id, tag_model).await?;
-    Ok(updated_tag)
+    let mut tag_model: TagModel = update_tag_dto.try_into()?;
+    tag_model.id = Some(id);
+
+    let result = update_tag(pool, id, tag_model).await?;
+    Ok(result)
 }
 
 /// Service pour récupérer tous les tags dans la base de données.

@@ -21,6 +21,7 @@ use crate::{
             delete_tag_controller::delete_tag_controller,
             get_all_tags_controller::get_all_tags_controller,
             get_tag_by_id_controller::get_tag_by_id_controller,
+            update_tag_controller::update_tag_controller,
         },
     },
     middlewares::jwt_middleware::JwtMiddleware,
@@ -31,6 +32,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
         web::scope("/api/v1")
             //.wrap(JwtMiddleware)
             .service(create_tag_controller)
+            .service(update_tag_controller)
             .service(get_all_tags_controller)
             .service(get_tag_by_id_controller)
             .service(delete_tag_controller)

@@ -30,6 +30,7 @@ use crate::{
         crate::controllers::categories::delete_category_controller::delete_category_controller,
         crate::controllers::categories::update_category_controller::update_category_controller,
         crate::controllers::tags::create_tag_controller::create_tag_controller,
+        crate::controllers::tags::update_tag_controller::update_tag_controller,
         crate::controllers::tags::delete_tag_controller::delete_tag_controller,
         crate::controllers::tags::get_tag_by_id_controller::get_tag_by_id_controller,
         crate::controllers::tags::get_all_tags_controller::get_all_tags_controller,

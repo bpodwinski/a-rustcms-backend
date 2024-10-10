@@ -40,7 +40,7 @@ mod tests {
 
     use super::*;
     use crate::dtos::tag_dto::CreateTagDTO;
-    use crate::tests::helpers::setup::setup_test_db;
+    use crate::tests::helpers::setup::{clean_data_test, setup_test_db};
 
     #[ntex::test]
     async fn test_create_tag_success() {
@@ -69,16 +69,10 @@ mod tests {
         // Assert
         assert_eq!(resp.status(), http::StatusCode::CREATED);
 
-        // Clean Data
-        sqlx::query!(
-            r#"
-            DELETE FROM tags WHERE name = $1
-            "#,
-            "New tag"
-        )
-        .execute(&pool)
-        .await
-        .expect("Failed to clean up test data");
+        // Clean up test data
+        clean_data_test(&pool, "tags", "name", "Test Create Tag Success")
+            .await
+            .expect("Failed to clean up test data");
     }
 
     #[ntex::test]

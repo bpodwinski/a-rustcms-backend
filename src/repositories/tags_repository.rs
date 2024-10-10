@@ -26,15 +26,15 @@ pub async fn insert_tag(
 pub async fn update_tag(
     pool: &PgPool,
     id: i32,
-    model: TagModel,
+    tag_model: TagModel,
 ) -> Result<TagModel> {
     let result = QueryBuilder::<TagModel>::new(&pool)
         .table("tags")
         .fields(&["name", "slug", "description"])
         .values(vec![
-            Bind::Text(model.name),
-            Bind::Text(model.slug),
-            model.description.map_or(Bind::Null, Bind::Text),
+            Bind::Text(tag_model.name),
+            Bind::Text(tag_model.slug),
+            tag_model.description.map_or(Bind::Null, Bind::Text),
         ])
         .update("id", Bind::Int(id))
         .await?;
