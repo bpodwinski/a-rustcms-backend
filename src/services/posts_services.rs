@@ -27,8 +27,8 @@ pub async fn get_all_posts_service(
     pool: &PgPool,
     page: i64,
     limit: i64,
-    sort_column: SortColumn,
-    sort_order: SortOrder,
+    sort_column: &str,
+    sort_order: &str,
 ) -> Result<PaginationDTO<PostDTO>> {
     let total_items = count_posts(pool).await?;
     let total_pages = (total_items as f64 / limit as f64).ceil() as i64;
@@ -40,19 +40,8 @@ pub async fn get_all_posts_service(
         page
     };
 
-    let sort_column_str = match sort_column {
-        SortColumn::Id => "p.id",
-        SortColumn::Title => "p.title",
-        SortColumn::AuthorId => "p.author_id",
-        SortColumn::DatePublished => "p.date_published",
-    };
-
-    let sort_order_str = match sort_order {
-        SortOrder::Asc => "ASC",
-        SortOrder::Desc => "DESC",
-    };
-
-    let posts_model = select_posts(pool, limit, offset).await?;
+    let posts_model =
+        select_posts(pool, limit, offset, sort_column, sort_order).await?;
 
     let posts_dto: Vec<PostDTO> =
         posts_model.into_iter().map(PostDTO::from).collect();

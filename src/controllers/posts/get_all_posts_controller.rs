@@ -22,7 +22,7 @@ use crate::{
         PaginationParamsDTO
     ),
     responses(
-        (status = 200, description = "List of posts retrieved successfully", body = PostDTO),
+        (status = 200, description = "Get all posts", body = PostDTO),
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     )
@@ -34,19 +34,8 @@ pub async fn get_all_posts_controller(
 ) -> Result<HttpResponse, web::Error> {
     let page = params.page.unwrap_or(1);
     let limit = params.limit.unwrap_or(20);
-
-    let sort_column = match params.sort_column.as_deref() {
-        Some("id") => SortColumn::Id,
-        Some("title") => SortColumn::Title,
-        Some("date_published") => SortColumn::DatePublished,
-        _ => SortColumn::Id,
-    };
-
-    let sort_order = match params.sort_order.as_deref() {
-        Some("asc") => SortOrder::Asc,
-        Some("desc") => SortOrder::Desc,
-        _ => SortOrder::Asc,
-    };
+    let sort_column = params.sort_column.as_deref().unwrap_or("id");
+    let sort_order = params.sort_order.as_deref().unwrap_or("desc");
 
     match get_all_posts_service(
         pool.get_ref(),
@@ -68,7 +57,6 @@ mod tests {
     use crate::dtos::post_dto::PostDTO;
     use crate::models::posts_model::PostsStatus;
     use crate::tests::helpers::setup::setup_test_db;
-    use chrono::NaiveDateTime;
     use ntex::http;
     use ntex::web::{self, test};
 

@@ -5,6 +5,16 @@ use crate::models::categories_model::CategoryModel;
 
 use super::{Bind, QueryBuilder};
 
+/// Inserts a new category into the database.
+///
+/// # Arguments
+///
+/// * `pool` - A reference to the PostgreSQL connection pool.
+/// * `category_model` - The `CategoryModel` instance containing the category data to insert.
+///
+/// # Returns
+///
+/// * `Result<CategoryModel>` - The newly inserted `CategoryModel` record.
 pub async fn insert_category(
     pool: &PgPool,
     category_model: CategoryModel,
@@ -24,6 +34,17 @@ pub async fn insert_category(
     Ok(result)
 }
 
+/// Updates an existing category in the database by its ID.
+///
+/// # Arguments
+///
+/// * `pool` - A reference to the PostgreSQL connection pool.
+/// * `id` - The ID of the category to update.
+/// * `model` - The `CategoryModel` instance containing the updated category data.
+///
+/// # Returns
+///
+/// * `Result<CategoryModel>` - The updated `CategoryModel` record.
 pub async fn update_category(
     pool: &PgPool,
     id: i32,
@@ -44,6 +65,15 @@ pub async fn update_category(
     Ok(result)
 }
 
+/// Retrieves all categories from the database.
+///
+/// # Arguments
+///
+/// * `pool` - A reference to the PostgreSQL connection pool.
+///
+/// # Returns
+///
+/// * `Result<Vec<CategoryModel>>` - A vector containing the retrieved `CategoryModel` records.
 pub async fn select_categories(pool: &PgPool) -> Result<Vec<CategoryModel>> {
     let result = QueryBuilder::<CategoryModel>::new(pool)
         .table("categories")
@@ -61,6 +91,16 @@ pub async fn select_categories(pool: &PgPool) -> Result<Vec<CategoryModel>> {
     Ok(result)
 }
 
+/// Retrieves a category by its ID from the database.
+///
+/// # Arguments
+///
+/// * `pool` - A reference to the PostgreSQL connection pool.
+/// * `id` - The ID of the category to retrieve.
+///
+/// # Returns
+///
+/// * `Result<CategoryModel>` - The `CategoryModel` record for the specified ID.
 pub async fn select_category_by_id(
     pool: &PgPool,
     id: i32,
@@ -81,6 +121,16 @@ pub async fn select_category_by_id(
     Ok(result)
 }
 
+/// Deletes categories by their IDs from the database.
+///
+/// # Arguments
+///
+/// * `pool` - A reference to the PostgreSQL connection pool.
+/// * `ids` - A vector containing the IDs of the categories to delete.
+///
+/// # Returns
+///
+/// * `Result<Vec<i32>>` - A vector containing the IDs of the deleted categories.
 pub async fn delete_category_by_id(
     pool: &PgPool,
     ids: Vec<i32>,

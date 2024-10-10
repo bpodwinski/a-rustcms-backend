@@ -78,6 +78,8 @@ struct QueryBuilder<'a, T> {
     values: Vec<Bind>,
     limit: Option<i64>,
     offset: Option<i64>,
+    sort_column: Option<String>,
+    sort_order: Option<String>,
     query_type: QueryType,
     _marker: std::marker::PhantomData<T>,
 }
@@ -110,6 +112,8 @@ where
             values: vec![],
             limit: None,
             offset: None,
+            sort_column: None,
+            sort_order: None,
             query_type: QueryType::Select,
             _marker: std::marker::PhantomData,
         }
@@ -175,6 +179,17 @@ where
         self
     }
 
+    fn sort_column(mut self, column: &str) -> Self {
+        self.sort_column = Some(column.to_string());
+        self
+    }
+
+    // Méthode pour définir l'ordre du tri
+    fn sort_order(mut self, order: &str) -> Self {
+        self.sort_order = Some(order.to_string());
+        self
+    }
+
     /// Builds and executes a SELECT query, with the option to return either one or multiple rows.
     ///
     /// # Arguments
@@ -185,16 +200,24 @@ where
     /// # Returns
     /// Returns a `Result` containing either a single item (`QueryResult::Single(T)`) or multiple items (`QueryResult::Multiple(Vec<T>)`).
     async fn select(
-        self,
+        mut self,
         id_field: Option<&str>,
         id_value: Option<&Bind>,
     ) -> Result<Vec<T>, Error> {
+        self.query_type = QueryType::Select;
         let mut query =
             format!("SELECT {} FROM {}", self.fields.join(", "), self.table);
 
         // Add WHERE clause if an ID filter is provided
         if let Some(id_field) = id_field {
             query.push_str(&format!(" WHERE {} = $1", id_field));
+        }
+
+        // Add ORDER if defined
+        if let Some(ref column) = self.sort_column {
+            let order =
+                self.sort_order.clone().unwrap_or_else(|| "ASC".to_string());
+            query.push_str(&format!(" ORDER BY {} {}", column, order));
         }
 
         // Add LIMIT if defined
@@ -220,10 +243,11 @@ where
 
     /// Builds and executes a SELECT query, returning a single row.
     async fn select_one(
-        self,
+        mut self,
         id_field: Option<&str>,
         id_value: Option<&Bind>,
     ) -> Result<T, Error> {
+        self.query_type = QueryType::Select;
         let mut query =
             format!("SELECT {} FROM {}", self.fields.join(", "), self.table);
 
@@ -334,10 +358,11 @@ where
     /// # Returns
     /// Returns a `Result` containing the list of deleted IDs.
     async fn delete(
-        self,
+        mut self,
         column: &str,
         ids: Vec<i32>,
     ) -> Result<Vec<i32>, Error> {
+        self.query_type = QueryType::Delete;
         let mut tx = self.pool.begin().await?;
 
         let query = format!(

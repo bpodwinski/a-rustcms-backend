@@ -1,7 +1,12 @@
-use ntex::web::{self, types::State, HttpResponse};
+use ntex::web::{
+    self,
+    types::{Query, State},
+    HttpResponse,
+};
 use sqlx::PgPool;
 
 use crate::{
+    dtos::pagination_dto::PaginationParamsDTO,
     handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::tags_service::get_all_tags_service,
 };
@@ -10,8 +15,14 @@ use crate::{
   get,
   path = "/tags",
   tag = "Tags",
+  params(
+    ("page" = Option<i32>, Query, description = "The page number for pagination"),
+    ("limit" = Option<i32>, Query, description = "The number of items per page"),
+    ("sort_column" = Option<String>, Query, description = "Column to sort by (e.g., 'id', 'name')"),
+    ("sort_order" = Option<String>, Query, description = "Sort order ('asc' or 'desc')")
+  ),
   responses(
-    (status = 200, description = "Get all tags", body = CategoryDTO),
+    (status = 200, description = "Get all tags", body = [TagDTO]),
     (status = 404, description = "Tags not found", body = Error),
     (status = 500, description = "Internal Server Error", body = Error)
   ),
@@ -19,8 +30,22 @@ use crate::{
 #[web::get("/tags")]
 pub async fn get_all_tags_controller(
     pool: State<PgPool>,
+    params: Query<PaginationParamsDTO>,
 ) -> Result<HttpResponse, web::Error> {
-    match get_all_tags_service(pool.get_ref()).await {
+    let page = params.page.unwrap_or(1);
+    let limit = params.limit.unwrap_or(25);
+    let sort_column = params.sort_column.as_deref().unwrap_or("id");
+    let sort_order = params.sort_order.as_deref().unwrap_or("desc");
+
+    match get_all_tags_service(
+        pool.get_ref(),
+        page,
+        limit,
+        sort_column,
+        sort_order,
+    )
+    .await
+    {
         Ok(tags) => Ok(HttpResponse::Ok().json(&tags)),
         Err(e) => Err(convert_anyhow_to_ntex(e)),
     }
