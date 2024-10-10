@@ -37,6 +37,7 @@ pub async fn delete_tag_controller(
 mod tests {
     use ntex::http;
     use ntex::web::{self, test};
+    use serde_json::json;
 
     use super::*;
     use crate::tests::helpers::setup::setup_test_db;
@@ -66,13 +67,26 @@ mod tests {
         .await
         .expect("Failed to insert test data");
 
+        let delete_ids = json!({
+            "ids": [inserted_tag.id]
+        });
+
         // Act
         let req = test::TestRequest::delete()
-            .uri(&format!("/tags/{}", inserted_tag.id))
+            .uri("/tags")
+            .set_json(&delete_ids)
             .to_request();
         let resp = test::call_service(&app, req).await;
 
         // Assert
-        assert_eq!(resp.status(), http::StatusCode::NO_CONTENT);
+        assert_eq!(resp.status(), http::StatusCode::OK);
+
+        let deleted_tag =
+            sqlx::query!("SELECT id FROM tags WHERE id = $1", inserted_tag.id)
+                .fetch_optional(&pool)
+                .await
+                .expect("Failed to query database for tag");
+
+        assert!(deleted_tag.is_none(), "Tag was not deleted");
     }
 }
