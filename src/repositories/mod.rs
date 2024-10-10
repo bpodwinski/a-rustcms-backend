@@ -372,8 +372,6 @@ where
 
         let sql_query = query_as::<_, (i32,)>(&query);
 
-        //sql_query = Bind::Int(ids.len() as i32).bind_to_query(sql_query);
-
         let rows = sql_query.bind(&ids).fetch_all(&mut *tx).await?;
 
         tx.commit().await?;

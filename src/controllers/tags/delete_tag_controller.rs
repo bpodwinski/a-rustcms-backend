@@ -22,7 +22,7 @@ use crate::{
         (status = 500, description = "Internal Server Error", body = Error)
     )
 )]
-#[web::delete("/tags/{id}")]
+#[web::delete("/tags")]
 pub async fn delete_tag_controller(
     pool: State<PgPool>,
     tag_id: Json<DeleteTagIdsDTO>,
