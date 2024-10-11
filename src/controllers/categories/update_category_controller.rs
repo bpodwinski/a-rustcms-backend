@@ -16,7 +16,7 @@ use crate::{
     put,
     path = "/categories/{id}",
     tag = "Categories",
-    request_body = CategoryDTO,
+    request_body = CreateCategoryDTO,
     params(
         ("id" = i32, description = "ID of the category")
     ),

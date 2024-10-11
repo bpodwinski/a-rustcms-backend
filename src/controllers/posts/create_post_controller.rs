@@ -14,7 +14,7 @@ use crate::{
     tag = "Posts",
     request_body = CreatePostDTO,
     responses(
-        (status = 201, description = "Post created successfully", body = CreatePostDTO),
+        (status = 201, description = "Post created successfully", body = PostDTO),
         (status = 400, description = "Validation error", body = Error),
         (status = 500, description = "Internal server error", body = Error)
     )

@@ -15,7 +15,10 @@ use super::{Bind, QueryBuilder};
 /// # Returns
 ///
 /// * `Result<PostModel>` - The newly inserted `PostModel` record.
-pub async fn insert_post(pool: &PgPool, model: PostModel) -> Result<PostModel> {
+pub async fn insert_post(
+    pool: &PgPool,
+    post_model: PostModel,
+) -> Result<PostModel> {
     let result = QueryBuilder::<PostModel>::new(&pool)
         .table("posts")
         .fields(&[
@@ -27,10 +30,10 @@ pub async fn insert_post(pool: &PgPool, model: PostModel) -> Result<PostModel> {
             "date_published",
         ])
         .values(vec![
-            Bind::Text(model.title),
-            Bind::Text(model.content),
-            Bind::Text(model.slug),
-            Bind::Int(model.author_id),
+            Bind::Text(post_model.title),
+            Bind::Text(post_model.content),
+            post_model.slug.map_or(Bind::Null, Bind::Text),
+            Bind::Int(post_model.author_id),
         ])
         .insert()
         .await?;
@@ -52,7 +55,7 @@ pub async fn insert_post(pool: &PgPool, model: PostModel) -> Result<PostModel> {
 pub async fn update_post(
     pool: &PgPool,
     id: i32,
-    model: PostModel,
+    post_model: PostModel,
 ) -> Result<PostModel> {
     let result = QueryBuilder::<PostModel>::new(&pool)
         .table("posts")
@@ -65,10 +68,10 @@ pub async fn update_post(
             "date_published",
         ])
         .values(vec![
-            Bind::Text(model.title),
-            Bind::Text(model.content),
-            Bind::Text(model.slug),
-            Bind::Int(model.author_id),
+            Bind::Text(post_model.title),
+            Bind::Text(post_model.content),
+            post_model.slug.map_or(Bind::Null, Bind::Text),
+            Bind::Int(post_model.author_id),
         ])
         .update("id", Bind::Int(id))
         .await?;
