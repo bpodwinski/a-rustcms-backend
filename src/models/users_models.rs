@@ -55,7 +55,7 @@ pub struct UserModel {
         message = "URL must be a maximum of 255 characters"
     ))]
     #[validate(url(message = "URL must be a valid URL"))]
-    pub url: String,
+    pub url: Option<String>,
 
     pub active: bool,
 
