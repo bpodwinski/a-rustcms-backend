@@ -24,7 +24,7 @@ pub async fn insert_tag(
         .fields(&["name", "slug", "description"])
         .values(vec![
             Bind::Text(tag_model.name),
-            Bind::Text(tag_model.slug),
+            tag_model.slug.map_or(Bind::Null, Bind::Text),
             tag_model.description.map_or(Bind::Null, Bind::Text),
         ])
         .insert()
@@ -54,7 +54,7 @@ pub async fn update_tag(
         .fields(&["name", "slug", "description"])
         .values(vec![
             Bind::Text(tag_model.name),
-            Bind::Text(tag_model.slug),
+            tag_model.slug.map_or(Bind::Null, Bind::Text),
             tag_model.description.map_or(Bind::Null, Bind::Text),
         ])
         .update("id", Bind::Int(id))

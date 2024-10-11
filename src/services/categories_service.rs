@@ -1,10 +1,12 @@
 use anyhow::Result;
 use sqlx::PgPool;
+use validator::Validate;
 
 use crate::dtos::category_dto::{
     CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO,
 };
 use crate::dtos::pagination_dto::PaginationDTO;
+use crate::handlers::generate_slug_handler::generate_slug;
 use crate::models::categories_model::CategoryModel;
 use crate::repositories::categories_repository::{
     count_categories, delete_category_by_id, insert_category,
@@ -27,7 +29,12 @@ pub async fn create_category_service(
     pool: &PgPool,
     create_category_dto: CreateCategoryDTO,
 ) -> Result<CategoryDTO> {
-    let category_model: CategoryModel = create_category_dto.try_into()?;
+    let mut category_model: CategoryModel = create_category_dto.try_into()?;
+
+    if category_model.slug.is_none() {
+        category_model.slug = Some(generate_slug(&category_model.name));
+    }
+    category_model.validate()?;
 
     let create_category_model = insert_category(pool, category_model).await?;
     let result = CategoryDTO::from(create_category_model);
@@ -52,6 +59,11 @@ pub async fn update_category_service(
 ) -> Result<CategoryDTO> {
     let mut category_model: CategoryModel = category_dto.try_into()?;
     category_model.id = Some(id);
+
+    if category_model.slug.is_none() {
+        category_model.slug = Some(generate_slug(&category_model.name));
+    }
+    category_model.validate()?;
 
     let update_category_model =
         update_category(pool, id, category_model).await?;

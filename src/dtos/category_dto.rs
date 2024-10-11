@@ -17,7 +17,7 @@ pub struct DeleteCategoryIdsDTO {
 pub struct CreateCategoryDTO {
     pub parent_id: Option<i32>,
     pub name: String,
-    pub slug: String,
+    pub slug: Option<String>,
     pub description: Option<String>,
 }
 
@@ -30,7 +30,7 @@ impl TryFrom<CreateCategoryDTO> for CategoryModel {
             id: None,
             parent_id: dto.parent_id,
             name: dto.name.trim().to_string(),
-            slug: dto.slug.trim().to_string(),
+            slug: dto.slug,
             description: dto.description.map(|desc| desc.trim().to_string()),
             date_created: None,
         };
@@ -46,7 +46,7 @@ pub struct CategoryDTO {
     pub id: Option<i32>,
     pub parent_id: Option<i32>,
     pub name: String,
-    pub slug: String,
+    pub slug: Option<String>,
     pub description: Option<String>,
     #[schema(value_type = String, format = "date-time", example = "2022-01-01T00:00:00")]
     pub date_created: Option<NaiveDateTime>,

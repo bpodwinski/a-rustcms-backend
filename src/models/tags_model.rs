@@ -1,9 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use validator::{Validate, ValidationError};
-
-use crate::validators::slug_validator::validate_slug;
+use validator::Validate;
 
 #[derive(Validate, Serialize, Deserialize, FromRow)]
 pub struct TagModel {
@@ -23,18 +21,10 @@ pub struct TagModel {
     ))]
     pub name: String,
 
-    #[validate(custom(function = "validate_slug_tag"))]
-    pub slug: String,
+    pub slug: Option<String>,
 
     pub description: Option<String>,
 
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     pub date_created: Option<NaiveDateTime>,
-}
-
-fn validate_slug_tag(slug: &str) -> Result<(), ValidationError> {
-    let min_length = 0;
-    let max_length = 200;
-
-    validate_slug(&slug, min_length, max_length)
 }

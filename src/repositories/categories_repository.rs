@@ -25,7 +25,7 @@ pub async fn insert_category(
         .values(vec![
             category_model.parent_id.map_or(Bind::Null, Bind::Int),
             Bind::Text(category_model.name),
-            Bind::Text(category_model.slug),
+            category_model.slug.map_or(Bind::Null, Bind::Text),
             category_model.description.map_or(Bind::Null, Bind::Text),
         ])
         .insert()
@@ -48,16 +48,16 @@ pub async fn insert_category(
 pub async fn update_category(
     pool: &PgPool,
     id: i32,
-    model: CategoryModel,
+    category_model: CategoryModel,
 ) -> Result<CategoryModel> {
     let result = QueryBuilder::<CategoryModel>::new(&pool)
         .table("categories")
         .fields(&["parent_id", "name", "slug", "description"])
         .values(vec![
-            model.parent_id.map_or(Bind::Null, Bind::Int),
-            Bind::Text(model.name),
-            Bind::Text(model.slug),
-            model.description.map_or(Bind::Null, Bind::Text),
+            category_model.parent_id.map_or(Bind::Null, Bind::Int),
+            Bind::Text(category_model.name),
+            category_model.slug.map_or(Bind::Null, Bind::Text),
+            category_model.description.map_or(Bind::Null, Bind::Text),
         ])
         .update("id", Bind::Int(id))
         .await?;

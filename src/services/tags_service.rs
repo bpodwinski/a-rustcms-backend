@@ -1,13 +1,16 @@
 use anyhow::Result;
 use sqlx::PgPool;
+use validator::Validate;
 
 use crate::dtos::pagination_dto::PaginationDTO;
 use crate::dtos::tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO};
+use crate::handlers::generate_slug_handler::generate_slug;
 use crate::models::tags_model::TagModel;
 use crate::repositories::tags_repository::{
     count_tags, delete_tag_by_id, insert_tag, select_tag_by_id, select_tags,
     update_tag,
 };
+use crate::validators::slug_validator::validate_slug;
 
 use super::calculate_pagination;
 
@@ -50,6 +53,11 @@ pub async fn update_tag_service(
 ) -> Result<TagDTO> {
     let mut tag_model: TagModel = tag_dto.try_into()?;
     tag_model.id = Some(id);
+
+    if tag_model.slug.is_none() {
+        tag_model.slug = Some(generate_slug(&tag_model.name));
+    }
+    tag_model.validate()?;
 
     let update_tag_model = update_tag(pool, id, tag_model).await?;
     let result = TagDTO::from(update_tag_model);

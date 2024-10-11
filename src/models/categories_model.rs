@@ -32,7 +32,7 @@ pub struct CategoryModel {
     pub name: String,
 
     #[validate(custom(function = "validate_slug_category"))]
-    pub slug: String,
+    pub slug: Option<String>,
 
     #[validate(length(
         max = 500,

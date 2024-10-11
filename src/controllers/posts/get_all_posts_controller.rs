@@ -6,10 +6,7 @@ use ntex::web::{
 use sqlx::PgPool;
 
 use crate::{
-    dtos::{
-        pagination_dto::PaginationParamsDTO,
-        post_dto::{SortColumn, SortOrder},
-    },
+    dtos::pagination_dto::PaginationParamsDTO,
     handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
     services::posts_services::get_all_posts_service,
 };
@@ -18,9 +15,12 @@ use crate::{
     get,
     path = "/posts",
     tag = "Posts",
-    params(
-        PaginationParamsDTO
-    ),
+  params(
+    ("page" = Option<i32>, Query, description = "The page number for pagination"),
+    ("limit" = Option<i32>, Query, description = "The number of items per page"),
+    ("sort_column" = Option<String>, Query, description = "Column to sort by (e.g., 'id', 'name')"),
+    ("sort_order" = Option<String>, Query, description = "Sort order ('asc' or 'desc')")
+  ),
     responses(
         (status = 200, description = "Get all posts", body = PostDTO),
         (status = 400, description = "Bad Request"),
@@ -33,7 +33,7 @@ pub async fn get_all_posts_controller(
     params: Query<PaginationParamsDTO>,
 ) -> Result<HttpResponse, web::Error> {
     let page = params.page.unwrap_or(1);
-    let limit = params.limit.unwrap_or(20);
+    let limit = params.limit.unwrap_or(25);
     let sort_column = params.sort_column.as_deref().unwrap_or("id");
     let sort_order = params.sort_order.as_deref().unwrap_or("desc");
 
@@ -56,7 +56,7 @@ mod tests {
     use crate::controllers::posts::get_all_posts_controller::get_all_posts_controller;
     use crate::dtos::post_dto::PostDTO;
     use crate::models::posts_model::PostsStatus;
-    use crate::tests::helpers::setup::setup_test_db;
+    use crate::tests::helpers::setup::{clean_data_test, setup_test_db};
     use ntex::http;
     use ntex::web::{self, test};
 
@@ -136,15 +136,9 @@ mod tests {
         assert!(post.is_some(), "Post not found in the response");
         assert_eq!(post.unwrap().status, PostsStatus::Published);
 
-        // Clean Data
-        sqlx::query!(
-            r#"
-            DELETE FROM posts WHERE id = $1
-            "#,
-            inserted_post.id
-        )
-        .execute(&pool)
-        .await
-        .expect("Failed to clean up test data");
+        // Clean up test data
+        clean_data_test(&pool, "posts", "name", "Test Post")
+            .await
+            .expect("Failed to clean up test data");
     }
 }
