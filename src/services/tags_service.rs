@@ -10,7 +10,6 @@ use crate::repositories::tags_repository::{
     count_tags, delete_tag_by_id, insert_tag, select_tag_by_id, select_tags,
     update_tag,
 };
-use crate::validators::slug_validator::validate_slug;
 
 use super::calculate_pagination;
 

@@ -32,7 +32,7 @@ pub struct PostModel {
     pub content: String,
 
     #[validate(custom(function = "validate_slug_post"))]
-    pub slug: String,
+    pub slug: Option<String>,
 
     // https://www.postgresql.org/docs/8.1/datatype.html#DATATYPE-NUMERIC
     #[validate(range(

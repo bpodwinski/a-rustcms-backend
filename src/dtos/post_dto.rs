@@ -4,7 +4,11 @@ use sqlx::FromRow;
 use utoipa::ToSchema;
 use validator::{Validate, ValidationErrors};
 
-use crate::models::posts_model::{PostModel, PostsStatus};
+use crate::{
+    handlers::generate_slug_handler::generate_slug,
+    models::posts_model::{PostModel, PostsStatus},
+    validators::slug_validator::validate_slug,
+};
 
 /// Batch deletion of post
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -22,7 +26,7 @@ pub struct PostId {
 pub struct CreatePostDTO {
     pub title: String,
     pub content: String,
-    pub slug: String,
+    pub slug: Option<String>,
     pub author_id: i32,
     pub status: PostsStatus,
     pub date_published: Option<NaiveDateTime>,
@@ -34,11 +38,24 @@ impl TryFrom<CreatePostDTO> for PostModel {
     type Error = ValidationErrors;
 
     fn try_from(dto: CreatePostDTO) -> Result<Self, Self::Error> {
+        let mut errors = ValidationErrors::new();
+        let slug = dto.slug.unwrap_or_else(|| generate_slug(&dto.title));
+        let min_length = 1;
+        let max_length = 200;
+        if let Err(validation_error) =
+            validate_slug(&slug, min_length, max_length)
+        {
+            errors.add("slug", validation_error.into());
+        }
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
         let post = PostModel {
             id: None,
             title: dto.title,
             content: dto.content,
-            slug: dto.slug,
+            slug: Some(slug),
             author_id: dto.author_id,
             status: dto.status,
             date_published: dto.date_published,
@@ -57,7 +74,7 @@ pub struct PostDTO {
     pub id: Option<i32>,
     pub title: String,
     pub content: String,
-    pub slug: String,
+    pub slug: Option<String>,
     pub author_id: i32,
     pub status: PostsStatus,
 

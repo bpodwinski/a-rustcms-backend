@@ -4,7 +4,11 @@ use sqlx::FromRow;
 use utoipa::ToSchema;
 use validator::{Validate, ValidationErrors};
 
-use crate::models::categories_model::CategoryModel;
+use crate::{
+    handlers::generate_slug_handler::generate_slug,
+    models::categories_model::CategoryModel,
+    validators::slug_validator::validate_slug,
+};
 
 /// Batch deletion of categories
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -26,11 +30,24 @@ impl TryFrom<CreateCategoryDTO> for CategoryModel {
     type Error = ValidationErrors;
 
     fn try_from(dto: CreateCategoryDTO) -> Result<Self, Self::Error> {
+        let mut errors = ValidationErrors::new();
+        let slug = dto.slug.unwrap_or_else(|| generate_slug(&dto.name));
+        let min_length = 1;
+        let max_length = 200;
+        if let Err(validation_error) =
+            validate_slug(&slug, min_length, max_length)
+        {
+            errors.add("slug", validation_error.into());
+        }
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
         let category = CategoryModel {
             id: None,
             parent_id: dto.parent_id,
             name: dto.name.trim().to_string(),
-            slug: dto.slug,
+            slug: Some(slug),
             description: dto.description.map(|desc| desc.trim().to_string()),
             date_created: None,
         };
