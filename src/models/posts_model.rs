@@ -14,7 +14,7 @@ pub struct PostModel {
     #[validate(range(
         min = 1,
         max = 2_147_483_647,
-        message = "Author ID must be between 1 and 2,147,483,647"
+        message = "ID must be between 1 and 2,147,483,647"
     ))]
     pub id: Option<i32>,
 
