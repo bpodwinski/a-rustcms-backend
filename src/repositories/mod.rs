@@ -8,12 +8,14 @@ pub mod categories_repository;
 pub mod posts_categories_repository;
 pub mod posts_repository;
 pub mod tags_repository;
+pub mod users_repository;
 
 /// Enum to represent different types of bindable values for SQL queries
 #[derive(Clone, Debug)]
 enum Bind {
     Int(i32),
     Text(String),
+    Bool(bool),
     Null,
 }
 
@@ -25,11 +27,13 @@ impl Bind {
         Q: BindableQuery<'q, DB>,
         i32: Encode<'q, DB> + Type<DB>,
         String: Encode<'q, DB> + Type<DB>,
+        bool: Encode<'q, DB> + Type<DB>,
         Option<i32>: Encode<'q, DB> + Type<DB>,
     {
         match self {
             Bind::Int(val) => query.bind_value(val),
             Bind::Text(val) => query.bind_value(val),
+            Bind::Bool(val) => query.bind_value(val),
             Bind::Null => query.bind_value(None::<i32>),
         }
     }
@@ -244,29 +248,25 @@ where
     /// Builds and executes a SELECT query, returning a single row.
     async fn select_one(
         mut self,
-        id_field: Option<&str>,
-        id_value: Option<&Bind>,
+        field: &str,
+        value: Bind,
     ) -> Result<T, Error> {
         self.query_type = QueryType::Select;
-        let mut query =
-            format!("SELECT {} FROM {}", self.fields.join(", "), self.table);
-
-        // Add WHERE clause if an ID filter is provided
-        if let Some(id_field) = id_field {
-            query.push_str(&format!(" WHERE {} = $1", id_field));
-        }
-
-        // Add LIMIT 1 to ensure only one result is returned
-        query.push_str(" LIMIT 1");
+        let query = format!(
+            "SELECT {} FROM {} WHERE {} = $1 LIMIT 1",
+            self.fields.join(", "),
+            self.table,
+            field
+        );
 
         let mut sql_query = query_as::<_, T>(&query);
 
-        if let Some(id_value) = id_value {
-            sql_query = id_value.clone().bind_to_query(sql_query);
-        }
+        sql_query = value.bind_to_query(sql_query);
 
         let row = sql_query.fetch_one(self.pool).await?;
-        Ok(row)
+
+        let test = row;
+        Ok(test)
     }
 
     /// Builds and executes an INSERT query.
@@ -328,6 +328,10 @@ where
             ),
             Bind::Text(ref val) => format!(
                 "UPDATE {} SET {} WHERE {} = '{}' RETURNING *;",
+                self.table, update_fields_str, field, val
+            ),
+            Bind::Bool(val) => format!(
+                "UPDATE {} SET {} WHERE {} = {} RETURNING *;",
                 self.table, update_fields_str, field, val
             ),
             Bind::Null => {

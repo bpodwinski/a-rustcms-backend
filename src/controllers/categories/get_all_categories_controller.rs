@@ -21,6 +21,9 @@ use crate::{
     ("sort_column" = Option<String>, Query, description = "Column to sort by (e.g., 'id', 'name')"),
     ("sort_order" = Option<String>, Query, description = "Sort order ('asc' or 'desc')")
   ),
+  security(
+    ("api_key" = [])
+),
   responses(
     (status = 200, description = "Get all categories", body = CategoryDTO),
     (status = 500, description = "Internal Server Error", body = Error)

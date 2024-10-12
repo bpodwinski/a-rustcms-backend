@@ -15,7 +15,7 @@ pub struct DeleteUserIdsDTO {
 /// Creating a user
 #[derive(FromRow, Serialize, Deserialize, ToSchema)]
 pub struct CreateUserDTO {
-    pub login: String,
+    pub username: String,
     pub password: String,
     pub email: String,
     pub firstname: String,
@@ -31,7 +31,7 @@ impl TryFrom<CreateUserDTO> for UserModel {
     fn try_from(dto: CreateUserDTO) -> Result<Self, Self::Error> {
         let user = UserModel {
             id: None,
-            login: dto.login,
+            username: dto.username,
             password: dto.password,
             email: dto.email,
             firstname: dto.firstname,
@@ -50,7 +50,7 @@ impl TryFrom<CreateUserDTO> for UserModel {
 #[derive(FromRow, Serialize, Deserialize, ToSchema)]
 pub struct UserDTO {
     pub id: Option<i32>,
-    pub login: String,
+    pub username: String,
     pub password: String,
     pub email: String,
     pub firstname: String,
@@ -66,7 +66,7 @@ impl From<UserModel> for UserDTO {
     fn from(user: UserModel) -> Self {
         UserDTO {
             id: user.id,
-            login: user.login,
+            username: user.username,
             password: user.password,
             email: user.email,
             firstname: user.firstname,
@@ -85,7 +85,7 @@ impl TryFrom<UserDTO> for UserModel {
     fn try_from(dto: UserDTO) -> Result<Self, Self::Error> {
         let user = UserModel {
             id: dto.id,
-            login: dto.login,
+            username: dto.username,
             password: dto.password,
             email: dto.email,
             firstname: dto.firstname,

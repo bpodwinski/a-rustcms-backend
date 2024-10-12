@@ -1,8 +1,10 @@
 use crate::dtos::pagination_dto::PaginationInfo;
 
+pub mod auth_service;
 pub mod categories_service;
 pub mod posts_services;
 pub mod tags_service;
+pub mod users_service;
 
 /// Calculate pagination information based on the total number of items, current page, and limit.
 ///

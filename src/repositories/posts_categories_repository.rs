@@ -53,7 +53,7 @@ pub async fn select_post_category_by_post_id(
     let result = QueryBuilder::<PostsCategoriesModel>::new(pool)
         .table("posts_categories")
         .fields(&["id", "post_id", "category_id", "date_created"])
-        .select_one(Some("post_id"), Some(&Bind::Int(id)))
+        .select_one("post_id", Bind::Int(id))
         .await?;
 
     Ok(result)

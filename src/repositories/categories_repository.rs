@@ -125,7 +125,7 @@ pub async fn select_category_by_id(
             "description",
             "date_created",
         ])
-        .select_one(Some("id"), Some(&Bind::Int(id)))
+        .select_one("id", Bind::Int(id))
         .await?;
 
     Ok(result)

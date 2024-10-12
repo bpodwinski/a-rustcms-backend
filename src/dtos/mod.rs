@@ -1,3 +1,4 @@
+pub mod auth_dtos;
 pub mod category_dto;
 pub mod pagination_dto;
 pub mod post_dto;

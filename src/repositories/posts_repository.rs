@@ -142,7 +142,7 @@ pub async fn select_post_by_id(pool: &PgPool, id: i32) -> Result<PostModel> {
             "status",
             "date_published",
         ])
-        .select_one(Some("id"), Some(&Bind::Int(id)))
+        .select_one("id", Bind::Int(id))
         .await?;
 
     Ok(result)

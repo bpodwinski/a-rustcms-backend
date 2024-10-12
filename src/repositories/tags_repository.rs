@@ -106,7 +106,7 @@ pub async fn select_tag_by_id(pool: &PgPool, id: i32) -> Result<TagModel> {
     let result = QueryBuilder::<TagModel>::new(pool)
         .table("tags")
         .fields(&["id", "name", "slug", "description", "date_created"])
-        .select_one(Some("id"), Some(&Bind::Int(id)))
+        .select_one("id", Bind::Int(id))
         .await?;
 
     Ok(result)

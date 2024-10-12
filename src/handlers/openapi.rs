@@ -1,14 +1,19 @@
 use ntex::util::Bytes;
 use ntex::web;
 use std::sync::Arc;
-use utoipa::OpenApi;
+use utoipa::{
+    openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
+    Modify, OpenApi,
+};
 
 use crate::{
     dtos::{
+        auth_dtos::{ClaimsDTO, LoginRequestDTO, TokenDTO},
         category_dto::{CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO},
         pagination_dto::PaginationParamsDTO,
         post_dto::{CreatePostDTO, DeletePostIdsDTO, PostDTO},
         tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO},
+        user_dtos::{CreateUserDTO, DeleteUserIdsDTO, UserDTO},
     },
     middlewares::error_middleware::Error,
     models::posts_model::PostsStatus,
@@ -17,12 +22,14 @@ use crate::{
 /// Main structure to generate OpenAPI documentation
 #[derive(OpenApi)]
 #[openapi(
-    components(schemas(
-        Claims
-    )),
-    security(
-        ("bearer_auth" = [])
+    components(
+        schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO,
+        TagDTO, PostDTO, CreateTagDTO, DeleteTagIdsDTO, CreatePostDTO, DeletePostIdsDTO,
+        DeleteUserIdsDTO, CreateUserDTO, UserDTO, PaginationParamsDTO, LoginRequestDTO,
+        TokenDTO, ClaimsDTO, PostsStatus
+        )
     ),
+    modifiers(&SecurityAddon),
     paths(
         crate::controllers::categories::create_category_controller::create_category_controller,
         crate::controllers::categories::get_all_categories_controller::get_all_categories_controller,
@@ -40,15 +47,32 @@ use crate::{
         crate::controllers::posts::delete_post_controller::delete_post_controller,
         crate::controllers::posts::update_post_controller::update_post_controller,
         crate::controllers::posts::get_post_by_id_controller::get_post_by_id_controller,
+        crate::controllers::users::get_user_by_id_controller::get_user_by_id_controller,
+        crate::controllers::users::create_user_controller::create_user_controller,
+        crate::controllers::users::update_user_controller::update_user_controller,
+        crate::controllers::users::delete_user_controller::delete_user_controller,
+        crate::controllers::auth::login_controller::login_controller,
     ),
-    components(schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO,
-        TagDTO, PostDTO, CreateTagDTO, DeleteTagIdsDTO, CreatePostDTO, DeletePostIdsDTO, PaginationParamsDTO, PostsStatus)),
     servers(
         (url = "/api/v1", description = "API v1")
     )
 )]
 
 pub(crate) struct ApiDoc;
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let components = openapi.components.as_mut().unwrap();
+        components.add_security_scheme(
+            "api_key",
+            SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new(
+                "Authorization",
+            ))),
+        )
+    }
+}
 
 #[web::get("/{tail}*")]
 async fn get_swagger(
