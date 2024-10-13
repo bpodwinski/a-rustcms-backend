@@ -48,6 +48,7 @@ use crate::{
         crate::controllers::posts::update_post_controller::update_post_controller,
         crate::controllers::posts::get_post_by_id_controller::get_post_by_id_controller,
         crate::controllers::users::get_user_by_id_controller::get_user_by_id_controller,
+        crate::controllers::users::get_all_users_controller::get_all_users_controller,
         crate::controllers::users::create_user_controller::create_user_controller,
         crate::controllers::users::update_user_controller::update_user_controller,
         crate::controllers::users::delete_user_controller::delete_user_controller,

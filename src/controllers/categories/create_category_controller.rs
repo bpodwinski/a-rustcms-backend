@@ -3,7 +3,7 @@ use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 use crate::dtos::category_dto::CreateCategoryDTO;
-use crate::handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex;
+use crate::handlers::error_to_response_handler::convert_anyhow_to_ntex;
 use crate::services::categories_service::create_category_service;
 
 #[utoipa::path(

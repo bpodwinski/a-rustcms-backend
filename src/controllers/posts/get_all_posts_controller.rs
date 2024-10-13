@@ -7,7 +7,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::pagination_dto::PaginationParamsDTO,
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::posts_services::get_all_posts_service,
 };
 

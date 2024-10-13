@@ -4,7 +4,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::post_dto::CreatePostDTO,
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::posts_services::create_post_service,
 };
 

@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::category_dto::{CategoryDTO, CreateCategoryDTO},
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::categories_service::update_category_service,
 };
 

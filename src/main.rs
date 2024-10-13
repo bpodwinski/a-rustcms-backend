@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
                     .finish(),
             )
             .state(pool.clone())
-            .configure(handlers::openapi::ntex_config)
+            .configure(handlers::openapi_handler::ntex_config)
             .configure(routes::init)
     })
     .workers(1)

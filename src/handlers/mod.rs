@@ -1,3 +1,3 @@
-pub mod convert_anyhow_to_ntex;
+pub mod error_to_response_handler;
 pub mod generate_slug_handler;
-pub mod openapi;
+pub mod openapi_handler;

@@ -6,13 +6,18 @@ use argon2::{
 use sqlx::PgPool;
 
 use crate::{
-    dtos::user_dtos::{CreateUserDTO, DeleteUserIdsDTO, UserDTO},
+    dtos::{
+        pagination_dto::PaginationDTO,
+        user_dtos::{CreateUserDTO, DeleteUserIdsDTO, UserDTO},
+    },
     models::users_models::UserModel,
     repositories::users_repository::{
-        delete_user_by_id, insert_user, select_user_by_email,
-        select_user_by_id, update_user,
+        count_users, delete_user_by_id, insert_user, select_user_by_email,
+        select_user_by_id, select_users, update_user,
     },
 };
+
+use super::calculate_pagination;
 
 pub async fn create_user_service(
     pool: &PgPool,
@@ -55,6 +60,31 @@ pub async fn update_user_service(
     let result = UserDTO::from(create_user_model);
 
     Ok(result)
+}
+
+pub async fn get_all_users_service(
+    pool: &PgPool,
+    page: i64,
+    limit: i64,
+    sort_column: &str,
+    sort_order: &str,
+) -> Result<PaginationDTO<UserDTO>> {
+    let total_items = count_users(pool).await?;
+    let pagination = calculate_pagination(total_items, page, limit);
+
+    let user_model: Vec<UserModel> =
+        select_users(pool, limit, pagination.offset, sort_column, sort_order)
+            .await?;
+
+    let user_dto: Vec<UserDTO> =
+        user_model.into_iter().map(UserDTO::from).collect();
+
+    Ok(PaginationDTO {
+        current_page: pagination.current_page,
+        total_pages: pagination.total_pages,
+        total_items: pagination.total_items,
+        data: user_dto,
+    })
 }
 
 pub async fn get_user_by_id_service(pool: &PgPool, id: i32) -> Result<UserDTO> {

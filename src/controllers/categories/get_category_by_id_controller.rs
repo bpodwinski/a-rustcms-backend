@@ -7,7 +7,7 @@ use ntex::web::{
 use sqlx::PgPool;
 
 use crate::{
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::categories_service::get_category_by_id_service,
 };
 

@@ -66,6 +66,36 @@ pub async fn update_user(
     Ok(result)
 }
 
+pub async fn select_users(
+    pool: &PgPool,
+    limit: i64,
+    offset: i64,
+    sort_column: &str,
+    sort_order: &str,
+) -> Result<Vec<UserModel>> {
+    let result = QueryBuilder::<UserModel>::new(pool)
+        .table("users")
+        .limit(limit)
+        .offset(offset)
+        .sort_column(sort_column)
+        .sort_order(sort_order)
+        .fields(&[
+            "id",
+            "username",
+            "password",
+            "email",
+            "firstname",
+            "lastname",
+            "url",
+            "active",
+            "date_created",
+        ])
+        .select(None, None)
+        .await?;
+
+    Ok(result)
+}
+
 pub async fn select_user_by_id(pool: &PgPool, id: i32) -> Result<UserModel> {
     let result = QueryBuilder::<UserModel>::new(&pool)
         .table("users")
@@ -116,6 +146,15 @@ pub async fn delete_user_by_id(
     let result = QueryBuilder::<UserModel>::new(pool)
         .table("users")
         .delete("id", ids)
+        .await?;
+
+    Ok(result)
+}
+
+pub async fn count_users(pool: &PgPool) -> Result<i64> {
+    let result = QueryBuilder::<UserModel>::new(pool)
+        .table("users")
+        .count()
         .await?;
 
     Ok(result)

@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::user_dtos::{CreateUserDTO, UserDTO},
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::users_service::update_user_service,
 };
 

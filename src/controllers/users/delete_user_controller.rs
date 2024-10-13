@@ -7,7 +7,7 @@ use sqlx::PgPool;
 
 use crate::{
     dtos::user_dtos::DeleteUserIdsDTO,
-    handlers::convert_anyhow_to_ntex::convert_anyhow_to_ntex,
+    handlers::error_to_response_handler::convert_anyhow_to_ntex,
     services::users_service::delete_user_by_id_service,
 };
 
