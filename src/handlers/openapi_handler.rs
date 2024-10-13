@@ -12,6 +12,7 @@ use crate::{
         category_dto::{CategoryDTO, CreateCategoryDTO, DeleteCategoryIdsDTO},
         pagination_dto::PaginationParamsDTO,
         post_dto::{CreatePostDTO, DeletePostIdsDTO, PostDTO},
+        posts_categories_dto::{CreatePostsCategoriesDTO, PostsCategoriesDTO},
         tag_dto::{CreateTagDTO, DeleteTagIdsDTO, TagDTO},
         user_dtos::{CreateUserDTO, DeleteUserIdsDTO, UserDTO},
     },
@@ -26,6 +27,7 @@ use crate::{
         schemas(Error, DeleteCategoryIdsDTO, CategoryDTO, CreateCategoryDTO,
         TagDTO, PostDTO, CreateTagDTO, DeleteTagIdsDTO, CreatePostDTO, DeletePostIdsDTO,
         DeleteUserIdsDTO, CreateUserDTO, UserDTO, PaginationParamsDTO, LoginRequestDTO,
+        PostsCategoriesDTO, CreatePostsCategoriesDTO,
         TokenDTO, ClaimsDTO, PostsStatus
         )
     ),
@@ -53,6 +55,7 @@ use crate::{
         crate::controllers::users::update_user_controller::update_user_controller,
         crate::controllers::users::delete_user_controller::delete_user_controller,
         crate::controllers::auth::login_controller::login_controller,
+        crate::controllers::posts_categories::create_posts_categories_controller::create_posts_categories_controller,
     ),
     servers(
         (url = "/api/v1", description = "API v1")

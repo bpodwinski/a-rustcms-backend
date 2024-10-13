@@ -17,6 +17,7 @@ use crate::{
             get_post_by_id_controller::get_post_by_id_controller,
             update_post_controller::update_post_controller,
         },
+        posts_categories::create_posts_categories_controller::create_posts_categories_controller,
         tags::{
             create_tag_controller::create_tag_controller,
             delete_tag_controller::delete_tag_controller,
@@ -43,25 +44,31 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .service(
                 web::scope("/")
                     .guard(JwtGuard)
+                    // Tag Controllers
                     .service(create_tag_controller)
-                    .service(update_tag_controller)
                     .service(get_all_tags_controller)
                     .service(get_tag_by_id_controller)
+                    .service(update_tag_controller)
                     .service(delete_tag_controller)
+                    // Category Controllers
                     .service(create_category_controller)
                     .service(get_all_categories_controller)
                     .service(get_category_by_id_controller)
                     .service(update_category_controller)
                     .service(delete_category_controller)
+                    // Post Controllers
                     .service(create_post_controller)
-                    .service(update_post_controller)
                     .service(get_all_posts_controller)
                     .service(get_post_by_id_controller)
+                    .service(update_post_controller)
                     .service(delete_post_controller)
+                    // User Controllers
                     .service(create_user_controller)
-                    .service(update_user_controller)
                     .service(get_user_by_id_controller)
-                    .service(delete_user_controller),
+                    .service(update_user_controller)
+                    .service(delete_user_controller)
+                    // Post-Category Relationship Controller
+                    .service(create_posts_categories_controller),
             ),
     );
 }

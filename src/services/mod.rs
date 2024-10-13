@@ -2,6 +2,7 @@ use crate::dtos::pagination_dto::PaginationInfo;
 
 pub mod auth_service;
 pub mod categories_service;
+pub mod posts_categories_service;
 pub mod posts_services;
 pub mod tags_service;
 pub mod users_service;
