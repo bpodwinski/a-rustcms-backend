@@ -34,7 +34,7 @@ A robust and scalable **Content Management System (CMS) backend** built in **Rus
 - **Logging**
   - Structured logging with `env_logger`
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Rust**
 - **tokio** - Asynchronous runtime for efficient concurrency
@@ -46,7 +46,7 @@ A robust and scalable **Content Management System (CMS) backend** built in **Rus
 - **utoipa** - OpenAPI documentation generation
 - **serde** - Data serialization/deserialization
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 ├── Cargo.toml               # Rust dependencies and project configuration
