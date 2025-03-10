@@ -37,6 +37,7 @@ A robust and scalable **Content Management System (CMS) backend** built in **Rus
 ## 🛠️ Technologies Used
 
 - **Rust**
+- **tokio** - Asynchronous runtime for efficient concurrency
 - **ntex** - Web framework for asynchronous operations
 - **sqlx** - Async database access for PostgreSQL
 - **dotenv** - Environment variable management
